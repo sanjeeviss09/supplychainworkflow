@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Warm Ivory Page Background: #F7F3EA */
+    --background: 42 45% 95%;
+    /* Primary Text Deep Forest Charcoal: #182820 */
+    --foreground: 147 25% 13%;
+
+    /* Ivory/White Card Surface: #FFFEFA */
+    --card: 48 100% 99%;
+    --card-foreground: 147 25% 13%;
+
+    --popover: 48 100% 99%;
+    --popover-foreground: 147 25% 13%;
+
+    /* Forest Green Primary: #0B3B2E */
+    --primary: 165 68% 14%;
+    --primary-foreground: 42 45% 95%;
+
+    /* Pale Sage Secondary: #E8EEDD */
+    --secondary: 83 33% 90%;
+    --secondary-foreground: 165 68% 14%;
+
+    /* Warm Muted Neutral: #EFECE2 */
+    --muted: 45 28% 91%;
+    /* Secondary Text: #5E6B61 */
+    --muted-foreground: 133 7% 40%;
+
+    /* Sage Accent: #A9BE98 */
+    --accent: 93 23% 67%;
+    --accent-foreground: 165 70% 10%;
+
+    /* Crimson Red Destructive: #B42318 */
+    --destructive: 4 77% 40%;
+    --destructive-foreground: 48 100% 99%;
+
+    /* Warm Stone Divider: #DEDCCF */
+    --border: 51 16% 84%;
+    --input: 51 16% 84%;
+    --ring: 165 68% 14%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Deep Forest Night */
+    --background: 165 70% 6%;
+    --foreground: 42 45% 95%;
+
+    --card: 165 68% 9%;
+    --card-foreground: 42 45% 95%;
+
+    --popover: 165 68% 9%;
+    --popover-foreground: 42 45% 95%;
+
+    --primary: 93 23% 67%;
+    --primary-foreground: 165 70% 10%;
+
+    --secondary: 165 60% 13%;
+    --secondary-foreground: 42 45% 95%;
+
+    --muted: 165 50% 12%;
+    --muted-foreground: 83 20% 70%;
+
+    --accent: 165 60% 15%;
+    --accent-foreground: 42 45% 95%;
+
+    --destructive: 4 77% 45%;
+    --destructive-foreground: 48 100% 99%;
+
+    --border: 165 40% 16%;
+    --input: 165 40% 16%;
+    --ring: 93 23% 67%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-sage/40 selection:text-ink-primary;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #F7F3EA;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #DEDCCF;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #A9BE98;
+  }
+
+  /* Accessibility: Prefers reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
