@@ -148,7 +148,7 @@ describe('Phase 3 Centralized Route Authorization & Permission Matrix', () => {
   });
 
   describe('Role-Aware Navigation Derivation', () => {
-    it('derives correct navigation items for Super Admin (all 12 nav items including suppliers)', () => {
+    it('derives correct navigation items for Super Admin (all 17 nav items including Phases 7–12)', () => {
       const items = getAuthorizedNavItems(superAdminPerms, true);
       const paths = items.map((i) => i.path);
 
@@ -156,18 +156,23 @@ describe('Phase 3 Centralized Route Authorization & Permission Matrix', () => {
       expect(paths).toContain('/app/projects');
       expect(paths).toContain('/app/materials');
       expect(paths).toContain('/app/suppliers');
+      expect(paths).toContain('/app/suppliers/performance');
       expect(paths).toContain('/app/budgets-approvals');
       expect(paths).toContain('/app/procurement');
       expect(paths).toContain('/app/deliveries');
+      expect(paths).toContain('/app/deliveries/planning');
+      expect(paths).toContain('/app/deliveries/issues');
+      expect(paths).toContain('/app/deliveries/risks');
+      expect(paths).toContain('/app/documents');
       expect(paths).toContain('/app/reports');
       expect(paths).toContain('/app/admin/employees');
       expect(paths).toContain('/app/admin/imports');
       expect(paths).toContain('/app/admin/audit-log');
       expect(paths).toContain('/app/settings');
-      expect(items.length).toBe(12);
+      expect(items.length).toBe(17);
     });
 
-    it('derives correct navigation items for SCM Admin (9 nav items including suppliers, no employee management or audit logs)', () => {
+    it('derives correct navigation items for SCM Admin (14 nav items including Phases 7–12, no employee management or audit logs)', () => {
       const items = getAuthorizedNavItems(scmAdminPerms, true);
       const paths = items.map((i) => i.path);
 
@@ -175,19 +180,24 @@ describe('Phase 3 Centralized Route Authorization & Permission Matrix', () => {
       expect(paths).toContain('/app/projects');
       expect(paths).toContain('/app/materials');
       expect(paths).toContain('/app/suppliers');
+      expect(paths).toContain('/app/suppliers/performance');
       expect(paths).toContain('/app/budgets-approvals');
       expect(paths).toContain('/app/procurement');
       expect(paths).toContain('/app/deliveries');
+      expect(paths).toContain('/app/deliveries/planning');
+      expect(paths).toContain('/app/deliveries/issues');
+      expect(paths).toContain('/app/deliveries/risks');
+      expect(paths).toContain('/app/documents');
       expect(paths).toContain('/app/reports');
       expect(paths).toContain('/app/settings');
 
       expect(paths).not.toContain('/app/admin/employees');
       expect(paths).not.toContain('/app/admin/imports');
       expect(paths).not.toContain('/app/admin/audit-log');
-      expect(items.length).toBe(9);
+      expect(items.length).toBe(14);
     });
 
-    it('derives correct navigation items for SCM Team User (6 nav items only including suppliers)', () => {
+    it('derives correct navigation items for SCM Team User (11 nav items including operational delivery modules)', () => {
       const items = getAuthorizedNavItems(scmTeamPerms, true);
       const paths = items.map((i) => i.path);
 
@@ -195,8 +205,13 @@ describe('Phase 3 Centralized Route Authorization & Permission Matrix', () => {
       expect(paths).toContain('/app/projects');
       expect(paths).toContain('/app/materials');
       expect(paths).toContain('/app/suppliers');
+      expect(paths).toContain('/app/suppliers/performance');
       expect(paths).toContain('/app/procurement');
       expect(paths).toContain('/app/deliveries');
+      expect(paths).toContain('/app/deliveries/planning');
+      expect(paths).toContain('/app/deliveries/issues');
+      expect(paths).toContain('/app/deliveries/risks');
+      expect(paths).toContain('/app/documents');
 
       expect(paths).not.toContain('/app/budgets-approvals');
       expect(paths).not.toContain('/app/reports');
@@ -204,7 +219,7 @@ describe('Phase 3 Centralized Route Authorization & Permission Matrix', () => {
       expect(paths).not.toContain('/app/admin/imports');
       expect(paths).not.toContain('/app/admin/audit-log');
       expect(paths).not.toContain('/app/settings');
-      expect(items.length).toBe(6);
+      expect(items.length).toBe(11);
     });
 
     it('returns empty navigation list if employee is inactive', () => {

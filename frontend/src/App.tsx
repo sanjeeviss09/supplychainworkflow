@@ -45,7 +45,9 @@ import { AuditLogsPage } from '@/pages/admin/AuditLogsPage';
 import { SettingsPage } from '@/pages/settings/SettingsPage';
 import { SystemSettingsPage } from '@/pages/settings/SystemSettingsPage';
 import { ScmSettingsPage } from '@/pages/settings/ScmSettingsPage';
-import { PlaceholderModulePage } from '@/pages/PlaceholderModulePage';
+import { ReportsPage } from '@/pages/ReportsPage';
+import { MaterialsPage } from '@/pages/materials/MaterialsPage';
+import { ProcurementPage } from '@/pages/procurement/ProcurementPage';
 import { useAuth } from '@/context/AuthContext';
 
 function RootRedirect() {
@@ -178,17 +180,7 @@ export function App() {
                 path="materials"
                 element={
                   <PermissionRouteGuard routePath="/app/materials">
-                    <PlaceholderModulePage
-                      title="Material Requirements (BOM)"
-                      phase="Phase 4"
-                      description="Bill of Materials creation across approved classifications (API, EXE, PM, Consumables) with CAS and HSN master references."
-                      keyFeatures={[
-                        'BOM items mapped to specific project milestones',
-                        '4 approved material categories (API, EXE, PM, Consumables)',
-                        'Quantity requirements and needed-by date scheduler',
-                        'CAS & HSN reference code catalog lookup',
-                      ]}
-                    />
+                    <MaterialsPage />
                   </PermissionRouteGuard>
                 }
               />
@@ -250,17 +242,7 @@ export function App() {
                 path="procurement"
                 element={
                   <PermissionRouteGuard routePath="/app/procurement">
-                    <PlaceholderModulePage
-                      title="Procurement (PR & PO Execution)"
-                      phase="Phase 5"
-                      description="Material requisition drafting (PR), multi-split quantity allocation, vendor Purchase Order generation (PO), and order acknowledgment."
-                      keyFeatures={[
-                        'Consolidated multi-line PR drafting from BOM',
-                        'Multi-tier sequential approval workflow routing',
-                        '18% GST tax calculation and commercial terms',
-                        'Digital Purchase Order issuance with acknowledgment tracking',
-                      ]}
-                    />
+                    <ProcurementPage />
                   </PermissionRouteGuard>
                 }
               />
@@ -362,17 +344,7 @@ export function App() {
                 path="reports"
                 element={
                   <PermissionRouteGuard routePath="/app/reports">
-                    <PlaceholderModulePage
-                      title="SCM Analytical Reports"
-                      phase="Phase 7"
-                      description="End-to-end supply chain operational reports, procurement cycle times, vendor on-time delivery metrics, and price variance analysis."
-                      keyFeatures={[
-                        'Vendor performance and on-time delivery ratings',
-                        'Budget vs Actual vs Invoiced financial reconciliation',
-                        'Material consumption velocity reports',
-                        'Compliance and audit export reports',
-                      ]}
-                    />
+                    <ReportsPage />
                   </PermissionRouteGuard>
                 }
               />
