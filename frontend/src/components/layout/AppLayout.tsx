@@ -16,6 +16,7 @@ import {
   HelpCircle,
   Boxes,
   ShieldCheck,
+  Settings,
 } from 'lucide-react';
 
 import {
@@ -136,7 +137,7 @@ export function AppLayout() {
                     : 'text-ivory/80 hover:bg-forest-light/60 hover:text-white'
                 }`}
               >
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 min-w-0">
                   {Icon && (
                     <Icon
                       className={`h-4 w-4 shrink-0 transition-colors ${
@@ -146,11 +147,11 @@ export function AppLayout() {
                       }`}
                     />
                   )}
-                  <span>{item.navTitle || item.title}</span>
+                  <span className="truncate">{item.navTitle || item.title}</span>
                 </div>
                 {item.badge && (
                   <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-medium ${
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-medium whitespace-nowrap shrink-0 ${
                       item.badgeVariant === 'success'
                         ? 'bg-emerald-900/60 text-emerald-200 border border-emerald-700/50'
                         : 'bg-forest-deep text-sage/90 border border-forest-light'
@@ -168,10 +169,14 @@ export function AppLayout() {
         <div className="p-4 border-t border-forest-deep/80 bg-forest-deep/30 text-xs text-sage/75">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] uppercase tracking-wider text-sage/60 font-semibold">Active Session</span>
-            <span className="flex items-center space-x-1 text-[10px] text-emerald-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>RLS Enforced</span>
-            </span>
+            <Link
+              to="/app/settings"
+              className="flex items-center space-x-1 text-[10px] text-sage hover:text-white transition-colors"
+              title="Platform Settings & Customization"
+            >
+              <Settings className="h-3 w-3" />
+              <span>Settings</span>
+            </Link>
           </div>
           <div className="text-[11px] font-mono text-ivory/90 truncate">
             {employee?.employee_id || 'System User'}
@@ -314,6 +319,16 @@ export function AppLayout() {
                 </div>
               )}
             </div>
+
+            {/* Quick Settings Icon */}
+            <Link
+              to="/app/settings"
+              className="p-1.5 rounded-md text-ink-secondary hover:text-forest hover:bg-ivory transition-colors"
+              title="Platform & SCM Settings"
+              aria-label="Settings"
+            >
+              <Settings className="h-4 w-4" />
+            </Link>
 
             {/* Profile Link Button */}
             <Link

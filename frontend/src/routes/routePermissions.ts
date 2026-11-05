@@ -114,8 +114,6 @@ export const ROUTE_REGISTRY: Record<string, RouteConfig> = {
     inNav: true,
     navOrder: 3,
     icon: FileSpreadsheet,
-    badge: 'BOM',
-    badgeVariant: 'success',
   },
   // Suppliers Module (Phase 6)
   '/app/suppliers': {
@@ -158,8 +156,6 @@ export const ROUTE_REGISTRY: Record<string, RouteConfig> = {
     inNav: true,
     navOrder: 4,
     icon: TrendingUp,
-    badge: 'Scorecards',
-    badgeVariant: 'success',
   },
   // Deliveries (Phase 7 Material Delivery Tracking)
   '/app/deliveries': {
@@ -171,8 +167,6 @@ export const ROUTE_REGISTRY: Record<string, RouteConfig> = {
     inNav: true,
     navOrder: 5,
     icon: Truck,
-    badge: 'SAP Tracking',
-    badgeVariant: 'success',
   },
   '/app/deliveries/my-assigned': {
     path: '/app/deliveries/my-assigned',
@@ -219,8 +213,6 @@ export const ROUTE_REGISTRY: Record<string, RouteConfig> = {
     inNav: true,
     navOrder: 7,
     icon: AlertTriangle,
-    badge: 'Escalations',
-    badgeVariant: 'success',
   },
   '/app/deliveries/issues/:issueId': {
     path: '/app/deliveries/issues/:issueId',
@@ -239,8 +231,6 @@ export const ROUTE_REGISTRY: Record<string, RouteConfig> = {
     inNav: true,
     navOrder: 6,
     icon: CalendarClock,
-    badge: 'Schedule',
-    badgeVariant: 'success',
   },
   // Phase 11 Material Supply Risk
   '/app/deliveries/risks': {
@@ -252,8 +242,6 @@ export const ROUTE_REGISTRY: Record<string, RouteConfig> = {
     inNav: true,
     navOrder: 8,
     icon: AlertOctagon,
-    badge: 'Risks',
-    badgeVariant: 'success',
   },
   '/app/deliveries/risks/:riskId': {
     path: '/app/deliveries/risks/:riskId',
@@ -272,8 +260,6 @@ export const ROUTE_REGISTRY: Record<string, RouteConfig> = {
     inNav: true,
     navOrder: 9,
     icon: FileText,
-    badge: 'Vault',
-    badgeVariant: 'success',
   },
   '/app/documents/:documentId': {
     path: '/app/documents/:documentId',
@@ -292,8 +278,6 @@ export const ROUTE_REGISTRY: Record<string, RouteConfig> = {
     inNav: true,
     navOrder: 10,
     icon: BarChart3,
-    badge: 'Analytics',
-    badgeVariant: 'success',
   },
   // Budgets & Approvals
   '/app/budgets-approvals': {
@@ -305,8 +289,6 @@ export const ROUTE_REGISTRY: Record<string, RouteConfig> = {
     inNav: true,
     navOrder: 11,
     icon: Coins,
-    badge: 'Governance',
-    badgeVariant: 'success',
   },
   // Procurement
   '/app/procurement': {
@@ -318,8 +300,6 @@ export const ROUTE_REGISTRY: Record<string, RouteConfig> = {
     inNav: true,
     navOrder: 12,
     icon: ShoppingCart,
-    badge: 'PR / PO',
-    badgeVariant: 'success',
   },
   // Administration: Employee Directory
   '/app/admin/employees': {

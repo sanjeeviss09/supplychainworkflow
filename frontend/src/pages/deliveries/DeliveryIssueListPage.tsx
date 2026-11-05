@@ -455,20 +455,114 @@ export function DeliveryIssueListPage() {
               </label>
             </div>
           </div>
+
+          {/* Quick Filter Bar */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-3 border-t border-divider/60">
+            <span className="text-[11px] font-semibold text-ink-secondary mr-1">Quick Filters:</span>
+            <button
+              type="button"
+              onClick={() => {
+                setStatusFilter('all');
+                setSeverityFilter('all');
+                setOverdueFollowupOnly(false);
+              }}
+              className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-colors ${
+                statusFilter === 'all' && severityFilter === 'all' && !overdueFollowupOnly
+                  ? 'bg-forest text-sage border-forest'
+                  : 'bg-ivory text-ink-secondary border-divider hover:bg-ivory-hover'
+              }`}
+            >
+              All ({totalCount})
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSeverityFilter(severityFilter === 'Critical' ? 'all' : 'Critical');
+              }}
+              className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-colors ${
+                severityFilter === 'Critical'
+                  ? 'bg-red-900 text-red-100 border-red-700'
+                  : 'bg-red-50 text-status-error border-red-200 hover:bg-red-100'
+              }`}
+            >
+              🚨 Critical ({metrics?.criticalIssues ?? 0})
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setOverdueFollowupOnly(!overdueFollowupOnly);
+              }}
+              className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-colors ${
+                overdueFollowupOnly
+                  ? 'bg-amber-900 text-amber-100 border-amber-700'
+                  : 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100'
+              }`}
+            >
+              ⏱ Overdue Follow-ups ({metrics?.overdueFollowups ?? 0})
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setStatusFilter(statusFilter === 'In Progress' ? 'all' : 'In Progress');
+              }}
+              className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-colors ${
+                statusFilter === 'In Progress'
+                  ? 'bg-forest text-sage border-forest'
+                  : 'bg-ivory text-ink-secondary border-divider hover:bg-ivory-hover'
+              }`}
+            >
+              ⏳ In Progress ({metrics?.inProgressIssues ?? 0})
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setStatusFilter(statusFilter === 'Escalated' ? 'all' : 'Escalated');
+              }}
+              className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-colors ${
+                statusFilter === 'Escalated'
+                  ? 'bg-copper text-white border-copper'
+                  : 'bg-copper-pale/40 text-copper border-copper/30 hover:bg-copper-pale'
+              }`}
+            >
+              ⚠️ Escalated ({metrics?.escalatedIssues ?? 0})
+            </button>
+            {(statusFilter !== 'all' ||
+              severityFilter !== 'all' ||
+              categoryFilter !== 'all' ||
+              supplierFilter !== '' ||
+              overdueFollowupOnly ||
+              searchTerm) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setStatusFilter('all');
+                  setSeverityFilter('all');
+                  setCategoryFilter('all');
+                  setSupplierFilter('');
+                  setOverdueFollowupOnly(false);
+                  setSearchTerm('');
+                  setViewScope('all');
+                }}
+                className="ml-auto text-[11px] text-ink-muted hover:text-status-error underline transition-colors"
+              >
+                Reset all filters
+              </button>
+            )}
+          </div>
         </CardContent>
       </Card>
 
       {/* Issues Register Table */}
       <Card className="border border-divider bg-ivory-surface shadow-warm-sm">
-        <CardHeader className="flex flex-col space-y-2 pb-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 border-b border-divider/60">
+        <CardHeader className="flex flex-col space-y-3 pb-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 border-b border-divider/60">
           <div>
             <CardTitle className="text-base font-bold text-forest">Issue Register ({totalCount})</CardTitle>
             <CardDescription className="text-xs text-ink-secondary">
               Tracked delivery exceptions linked to SAP PO reference lines.
             </CardDescription>
           </div>
-          <div className="w-full sm:w-64">
-            <div className="relative">
+          <div className="flex items-center space-x-2.5 w-full sm:w-auto">
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-ink-muted" />
               <Input
                 type="text"
@@ -478,6 +572,16 @@ export function DeliveryIssueListPage() {
                 className="pl-8 h-8 text-xs bg-ivory"
               />
             </div>
+            {canCreate && (
+              <Button
+                size="sm"
+                onClick={() => setIsCreateModalOpen(true)}
+                className="h-8 bg-forest hover:bg-forest-deep text-sage text-xs shadow-warm-sm whitespace-nowrap shrink-0"
+              >
+                <Plus className="h-3.5 w-3.5 mr-1 text-sage" />
+                Report Issue
+              </Button>
+            )}
           </div>
         </CardHeader>
 
@@ -549,17 +653,17 @@ export function DeliveryIssueListPage() {
                           </div>
                         </td>
                         <td className="py-3 px-3">
-                          <span className="rounded bg-ivory-hover px-2 py-0.5 text-[11px] font-medium text-ink-primary border border-divider">
+                          <span className="inline-block whitespace-nowrap rounded bg-ivory-hover px-2.5 py-1 text-[11px] font-medium text-ink-primary border border-divider">
                             {iss.issue_type}
                           </span>
                         </td>
                         <td className="py-3 px-3 text-center">
-                          <span className={`inline-block rounded-full px-2.5 py-0.5 text-[10px] font-semibold border ${sevColor}`}>
+                          <span className={`inline-block whitespace-nowrap rounded-full px-2.5 py-0.5 text-[10px] font-semibold border ${sevColor}`}>
                             {iss.severity}
                           </span>
                         </td>
                         <td className="py-3 px-3 text-center">
-                          <span className={`inline-block rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${statusColor}`}>
+                          <span className={`inline-block whitespace-nowrap rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${statusColor}`}>
                             {iss.status}
                           </span>
                         </td>
@@ -583,13 +687,13 @@ export function DeliveryIssueListPage() {
                         </td>
                         <td className="py-3 px-4 text-center">
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
                             onClick={() => navigate(`/app/deliveries/issues/${iss.id}`)}
-                            className="h-7 text-xs text-forest hover:bg-forest/10 hover:text-forest-deep"
+                            className="h-7 px-2.5 text-xs font-semibold text-forest border-forest/30 hover:bg-forest hover:text-sage shadow-xs transition-all whitespace-nowrap"
                           >
                             <span>Inspect</span>
-                            <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                            <ChevronRight className="h-3 w-3 ml-1" />
                           </Button>
                         </td>
                       </tr>

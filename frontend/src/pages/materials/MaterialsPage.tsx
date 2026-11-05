@@ -463,62 +463,102 @@ export function MaterialsPage() {
         </div>
       </div>
 
-      {/* KPI Cards */}
+      {/* Interactive Category Filter KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-        <Card className="border-divider shadow-warm-xs bg-white">
-          <CardContent className="p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-ink-muted">Master Materials</span>
-              <Boxes className="h-4 w-4 text-forest" />
-            </div>
-            <div className="text-xl font-bold text-forest mt-1">{stats.totalMaterials}</div>
-            <span className="text-[10px] text-ink-muted">Catalog items</span>
-          </CardContent>
-        </Card>
+        <button
+          type="button"
+          onClick={() => setSelectedCategory('ALL')}
+          className={`text-left rounded-xl transition-all cursor-pointer ${
+            selectedCategory === 'ALL' ? 'ring-2 ring-forest shadow-warm-sm' : 'hover:opacity-90'
+          }`}
+        >
+          <Card className={`border-divider shadow-warm-xs h-full ${selectedCategory === 'ALL' ? 'bg-sage-pale/40 border-forest' : 'bg-white'}`}>
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-ink-primary">All Materials</span>
+                <Boxes className="h-4 w-4 text-forest" />
+              </div>
+              <div className="text-xl font-bold text-forest mt-1">{stats.totalMaterials}</div>
+              <span className="text-[10px] text-ink-muted">All active catalog</span>
+            </CardContent>
+          </Card>
+        </button>
 
-        <Card className="border-divider shadow-warm-xs bg-white">
-          <CardContent className="p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-purple-700">API Actives</span>
-              <FlaskConical className="h-4 w-4 text-purple-600" />
-            </div>
-            <div className="text-xl font-bold text-purple-900 mt-1">{stats.apiCount}</div>
-            <span className="text-[10px] text-ink-muted">Pharmaceutical</span>
-          </CardContent>
-        </Card>
+        <button
+          type="button"
+          onClick={() => setSelectedCategory('API')}
+          className={`text-left rounded-xl transition-all cursor-pointer ${
+            selectedCategory === 'API' ? 'ring-2 ring-purple-600 shadow-warm-sm' : 'hover:opacity-90'
+          }`}
+        >
+          <Card className={`border-divider shadow-warm-xs h-full ${selectedCategory === 'API' ? 'bg-purple-50 border-purple-400' : 'bg-white'}`}>
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-purple-700">API Actives</span>
+                <FlaskConical className="h-4 w-4 text-purple-600" />
+              </div>
+              <div className="text-xl font-bold text-purple-900 mt-1">{stats.apiCount}</div>
+              <span className="text-[10px] text-purple-600/80">Active Ingredients</span>
+            </CardContent>
+          </Card>
+        </button>
 
-        <Card className="border-divider shadow-warm-xs bg-white">
-          <CardContent className="p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-blue-700">Excipients</span>
-              <Layers className="h-4 w-4 text-blue-600" />
-            </div>
-            <div className="text-xl font-bold text-blue-900 mt-1">{stats.exeCount}</div>
-            <span className="text-[10px] text-ink-muted">Binders & Disintegrants</span>
-          </CardContent>
-        </Card>
+        <button
+          type="button"
+          onClick={() => setSelectedCategory('EXE')}
+          className={`text-left rounded-xl transition-all cursor-pointer ${
+            selectedCategory === 'EXE' ? 'ring-2 ring-blue-600 shadow-warm-sm' : 'hover:opacity-90'
+          }`}
+        >
+          <Card className={`border-divider shadow-warm-xs h-full ${selectedCategory === 'EXE' ? 'bg-blue-50 border-blue-400' : 'bg-white'}`}>
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-blue-700">Excipients</span>
+                <Layers className="h-4 w-4 text-blue-600" />
+              </div>
+              <div className="text-xl font-bold text-blue-900 mt-1">{stats.exeCount}</div>
+              <span className="text-[10px] text-blue-600/80">Vehicle & Stabilizer</span>
+            </CardContent>
+          </Card>
+        </button>
 
-        <Card className="border-divider shadow-warm-xs bg-white">
-          <CardContent className="p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-amber-700">Packaging (PM)</span>
-              <Package className="h-4 w-4 text-amber-600" />
-            </div>
-            <div className="text-xl font-bold text-amber-900 mt-1">{stats.pmCount}</div>
-            <span className="text-[10px] text-ink-muted">Vials, Blisters, Cartons</span>
-          </CardContent>
-        </Card>
+        <button
+          type="button"
+          onClick={() => setSelectedCategory('PM')}
+          className={`text-left rounded-xl transition-all cursor-pointer ${
+            selectedCategory === 'PM' ? 'ring-2 ring-amber-600 shadow-warm-sm' : 'hover:opacity-90'
+          }`}
+        >
+          <Card className={`border-divider shadow-warm-xs h-full ${selectedCategory === 'PM' ? 'bg-amber-50 border-amber-400' : 'bg-white'}`}>
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-amber-700">Packaging (PM)</span>
+                <Package className="h-4 w-4 text-amber-600" />
+              </div>
+              <div className="text-xl font-bold text-amber-900 mt-1">{stats.pmCount}</div>
+              <span className="text-[10px] text-amber-600/80">Vials, Foil & Cartons</span>
+            </CardContent>
+          </Card>
+        </button>
 
-        <Card className="border-divider shadow-warm-xs bg-white">
-          <CardContent className="p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-teal-700">Consumables</span>
-              <CheckCircle2 className="h-4 w-4 text-teal-600" />
-            </div>
-            <div className="text-xl font-bold text-teal-900 mt-1">{stats.consumablesCount}</div>
-            <span className="text-[10px] text-ink-muted">Lab Reagents & Filters</span>
-          </CardContent>
-        </Card>
+        <button
+          type="button"
+          onClick={() => setSelectedCategory('Consumables')}
+          className={`text-left rounded-xl transition-all cursor-pointer ${
+            selectedCategory === 'Consumables' ? 'ring-2 ring-teal-600 shadow-warm-sm' : 'hover:opacity-90'
+          }`}
+        >
+          <Card className={`border-divider shadow-warm-xs h-full ${selectedCategory === 'Consumables' ? 'bg-teal-50 border-teal-400' : 'bg-white'}`}>
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-teal-700">Consumables</span>
+                <CheckCircle2 className="h-4 w-4 text-teal-600" />
+              </div>
+              <div className="text-xl font-bold text-teal-900 mt-1">{stats.consumablesCount}</div>
+              <span className="text-[10px] text-teal-600/80">Reagents & Filters</span>
+            </CardContent>
+          </Card>
+        </button>
 
         <Card className="border-divider shadow-warm-xs bg-forest text-white">
           <CardContent className="p-3">
