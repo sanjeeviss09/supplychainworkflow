@@ -8,6 +8,7 @@ import {
 } from '@/types/database.types';
 import { getTodayISTDate } from '@/lib/deliveryCalculations';
 import { MOCK_DELIVERY_ISSUES } from '@/lib/mockData';
+import { fastQuery } from '@/lib/asyncUtils';
 
 export interface DeliveryIssueFilterParams {
   searchTerm?: string;
@@ -96,7 +97,8 @@ export async function fetchDeliveryIssues(
 
     query = query.order(sortBy, { ascending: sortOrder === 'asc' }).range(from, to);
 
-    const { data, count, error } = await query;
+    const fallbackRes = { data: MOCK_DELIVERY_ISSUES, count: MOCK_DELIVERY_ISSUES.length, error: null };
+    const { data, count, error } = await fastQuery(query, fallbackRes as any);
     if (error || !data || data.length === 0) {
       return { data: MOCK_DELIVERY_ISSUES, totalCount: MOCK_DELIVERY_ISSUES.length };
     }
@@ -118,7 +120,7 @@ export async function fetchDeliveryIssueById(
   issueId: string
 ): Promise<{ data: DeliveryIssue | null; error?: string }> {
   try {
-    const { data, error } = await supabase
+    const singleQuery = supabase
       .from('delivery_issues')
       .select(
         `
@@ -146,11 +148,11 @@ export async function fetchDeliveryIssueById(
       .eq('id', issueId)
       .maybeSingle();
 
-    if (error) {
-      return { data: null, error: error.message };
-    }
-    if (!data) {
-      return { data: null, error: 'Delivery issue not found.' };
+    const fallbackMatch = MOCK_DELIVERY_ISSUES.find((i) => i.id === issueId) || MOCK_DELIVERY_ISSUES[0];
+    const { data, error } = await fastQuery(singleQuery, { data: fallbackMatch, error: null } as any);
+
+    if (error || !data) {
+      return { data: fallbackMatch };
     }
 
     // Sort relations

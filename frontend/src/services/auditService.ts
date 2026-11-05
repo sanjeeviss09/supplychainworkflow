@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { AuditLog } from '@/types/database.types';
 import { MOCK_AUDIT_LOGS } from '@/lib/mockData';
+import { fastQuery } from '@/lib/asyncUtils';
 
 const SENSITIVE_AUDIT_KEYS = new Set([
   'password',
@@ -129,7 +130,7 @@ export async function fetchAuditLogs(
       query = query.eq('outcome', outcome);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await fastQuery(query, { data: MOCK_AUDIT_LOGS, error: null } as any);
 
     if (error || !data || data.length === 0) {
       return { data: MOCK_AUDIT_LOGS };

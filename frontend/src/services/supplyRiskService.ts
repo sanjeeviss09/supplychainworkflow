@@ -10,6 +10,7 @@ import {
   SupplyRiskStatus,
 } from '@/types/database.types';
 import { MOCK_SUPPLY_RISKS } from '@/lib/mockData';
+import { fastQuery } from '@/lib/asyncUtils';
 
 export interface SupplyRiskFilters {
   search?: string;
@@ -184,7 +185,7 @@ export async function fetchSupplyRisks(filters: SupplyRiskFilters = {}): Promise
       query = query.eq('material_criticality', filters.criticality);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await fastQuery(query, { data: MOCK_SUPPLY_RISKS, error: null } as any);
     if (error || !data || data.length === 0) {
       return MOCK_SUPPLY_RISKS;
     }
@@ -215,7 +216,7 @@ export async function fetchSupplyRisks(filters: SupplyRiskFilters = {}): Promise
  */
 export async function fetchSupplyRiskById(riskId: string): Promise<SupplyRiskRecord | null> {
   try {
-    const { data, error } = await supabase
+    const singleQuery = supabase
       .from('supply_risk_records')
       .select(`
         *,
@@ -239,8 +240,11 @@ export async function fetchSupplyRiskById(riskId: string): Promise<SupplyRiskRec
       .eq('id', riskId)
       .single();
 
+    const fallbackMatch = MOCK_SUPPLY_RISKS.find((r) => r.id === riskId) || MOCK_SUPPLY_RISKS[0];
+    const { data, error } = await fastQuery(singleQuery, { data: fallbackMatch, error: null } as any);
+
     if (error || !data) {
-      return MOCK_SUPPLY_RISKS.find((r) => r.id === riskId) || MOCK_SUPPLY_RISKS[0];
+      return fallbackMatch;
     }
 
     return data as SupplyRiskRecord;

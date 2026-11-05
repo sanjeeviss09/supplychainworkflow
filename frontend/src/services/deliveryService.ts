@@ -12,6 +12,7 @@ import {
 } from '@/types/database.types';
 import { calculateDeliveryMetrics, getTodayISTDate } from '@/lib/deliveryCalculations';
 import { MOCK_DELIVERIES } from '@/lib/mockData';
+import { fastQuery } from '@/lib/asyncUtils';
 
 export interface DeliveryFilters {
   searchTerm?: string;
@@ -120,7 +121,8 @@ export async function fetchDeliveryTrackingList(filters: DeliveryFilters = {}): 
 
     query = query.order(sortBy, { ascending: sortOrder === 'asc' }).range(from, to);
 
-    const { data, count, error } = await query;
+    const fallbackRes = { data: MOCK_DELIVERIES, count: MOCK_DELIVERIES.length, error: null };
+    const { data, count, error } = await fastQuery(query, fallbackRes as any);
 
     if (error || !data || data.length === 0) {
       return {
@@ -143,7 +145,7 @@ export async function fetchDeliveryTrackingList(filters: DeliveryFilters = {}): 
  */
 export async function fetchDeliveryTrackingById(id: string): Promise<{ data: MaterialDeliveryTracking | null; error?: string }> {
   try {
-    const [trackingRes, updatesRes, delayLogsRes, dateHistoryRes, assignmentsRes, docsRes] = await Promise.all([
+    const fetchPromises = Promise.all([
       supabase
         .from('material_delivery_tracking')
         .select('*, assigned_employee:employees!assigned_employee_id(*), project:projects(*), department:departments(*), supplier:suppliers(*)')
@@ -175,6 +177,9 @@ export async function fetchDeliveryTrackingById(id: string): Promise<{ data: Mat
         .eq('tracking_id', id)
         .order('uploaded_at', { ascending: false }),
     ]);
+
+    const fallbackBatch = [{ error: new Error('offline'), data: null }, { data: [] }, { data: [] }, { data: [] }, { data: [] }, { data: [] }];
+    const [trackingRes, updatesRes, delayLogsRes, dateHistoryRes, assignmentsRes, docsRes] = await fastQuery(fetchPromises, fallbackBatch as any);
 
     if (trackingRes.error || !trackingRes.data) {
       const match = MOCK_DELIVERIES.find((d) => d.id === id) || MOCK_DELIVERIES[0];

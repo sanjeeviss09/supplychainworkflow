@@ -10,6 +10,7 @@ import {
   SupplierType,
 } from '@/types/database.types';
 import { MOCK_SUPPLIERS } from '@/lib/mockData';
+import { fastQuery } from '@/lib/asyncUtils';
 
 export interface SupplierFilters {
   searchTerm?: string;
@@ -71,7 +72,8 @@ export async function fetchSuppliers(filters: SupplierFilters = {}): Promise<Sup
 
     query = query.order(sortBy, { ascending: sortOrder === 'asc' }).range(from, to);
 
-    const { data, count, error } = await query;
+    const fallbackRes = { data: MOCK_SUPPLIERS, count: MOCK_SUPPLIERS.length, error: null };
+    const { data, count, error } = await fastQuery(query, fallbackRes as any);
 
     if (error || !data || data.length === 0) {
       return { data: MOCK_SUPPLIERS, totalCount: MOCK_SUPPLIERS.length };
@@ -91,14 +93,16 @@ export async function fetchSuppliers(filters: SupplierFilters = {}): Promise<Sup
  */
 export async function fetchSupplierById(supplierId: string): Promise<{ data?: Supplier | null; error?: string }> {
   try {
-    const { data, error } = await supabase
+    const singleQuery = supabase
       .from('suppliers')
       .select('*')
       .eq('id', supplierId)
       .single();
 
+    const match = MOCK_SUPPLIERS.find((s) => s.id === supplierId) || MOCK_SUPPLIERS[0];
+    const { data, error } = await fastQuery(singleQuery, { data: match, error: null } as any);
+
     if (error || !data) {
-      const match = MOCK_SUPPLIERS.find((s) => s.id === supplierId) || MOCK_SUPPLIERS[0];
       return { data: match };
     }
 

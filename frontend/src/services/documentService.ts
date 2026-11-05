@@ -8,6 +8,7 @@ import {
   ScmDocumentRecord,
 } from '@/types/database.types';
 import { MOCK_DOCUMENTS } from '@/lib/mockData';
+import { fastQuery } from '@/lib/asyncUtils';
 
 export interface DocumentFilters {
   search?: string;
@@ -104,7 +105,7 @@ export async function fetchScmDocuments(filters: DocumentFilters = {}): Promise<
       query = query.eq('review_status', filters.reviewStatus);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await fastQuery(query, { data: MOCK_DOCUMENTS, error: null } as any);
     if (error || !data || data.length === 0) {
       return MOCK_DOCUMENTS;
     }
@@ -153,7 +154,7 @@ export async function fetchScmDocuments(filters: DocumentFilters = {}): Promise<
  */
 export async function fetchScmDocumentById(docId: string): Promise<ScmDocumentRecord | null> {
   try {
-    const { data, error } = await supabase
+    const singleQuery = supabase
       .from('scm_documents')
       .select(`
         *,
@@ -168,8 +169,11 @@ export async function fetchScmDocumentById(docId: string): Promise<ScmDocumentRe
       .eq('id', docId)
       .single();
 
+    const fallbackMatch = MOCK_DOCUMENTS.find((d) => d.id === docId) || MOCK_DOCUMENTS[0];
+    const { data, error } = await fastQuery(singleQuery, { data: fallbackMatch, error: null } as any);
+
     if (error || !data) {
-      return MOCK_DOCUMENTS.find((d) => d.id === docId) || MOCK_DOCUMENTS[0];
+      return fallbackMatch;
     }
 
     const doc = data as ScmDocumentRecord;

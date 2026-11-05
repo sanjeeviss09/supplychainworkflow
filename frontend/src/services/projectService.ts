@@ -8,7 +8,8 @@ import {
   ProjectMember,
   ProjectStatus,
 } from '@/types/database.types';
-import { MOCK_PROJECTS, MOCK_MILESTONES } from '@/lib/mockData';
+import { MOCK_PROJECTS, MOCK_MILESTONES, MOCK_DEPARTMENTS, MOCK_EMPLOYEES } from '@/lib/mockData';
+import { fastQuery } from '@/lib/asyncUtils';
 
 export interface ProjectFilters {
   searchTerm?: string;
@@ -81,7 +82,8 @@ export async function fetchProjectsList(filters: ProjectFilters = {}): Promise<P
 
     query = query.order(sortBy, { ascending: sortOrder === 'asc' }).range(from, to);
 
-    const { data, count, error } = await query;
+    const fallbackRes = { data: MOCK_PROJECTS, count: MOCK_PROJECTS.length, error: null };
+    const { data, count, error } = await fastQuery(query, fallbackRes as any);
 
     if (error || !data || data.length === 0) {
       return {
@@ -104,14 +106,16 @@ export async function fetchProjectsList(filters: ProjectFilters = {}): Promise<P
  */
 export async function fetchProjectById(projectId: string): Promise<{ data?: Project; error?: string }> {
   try {
-    const { data, error } = await supabase
+    const singleQuery = supabase
       .from('projects')
       .select('*, department:departments(*), owner:employees!owner_employee_id(*)')
       .eq('id', projectId)
       .maybeSingle();
 
+    const match = MOCK_PROJECTS.find((p) => p.id === projectId) || MOCK_PROJECTS[0];
+    const { data, error } = await fastQuery(singleQuery, { data: match, error: null } as any);
+
     if (error || !data) {
-      const match = MOCK_PROJECTS.find((p) => p.id === projectId) || MOCK_PROJECTS[0];
       return { data: match };
     }
 
@@ -304,14 +308,20 @@ export async function changeProjectOwner(projectId: string, newOwnerEmployeeId: 
  */
 export async function fetchProjectMilestones(projectId: string): Promise<{ data: Milestone[]; error?: string }> {
   try {
-    const { data, error } = await supabase
+    const query = supabase
       .from('milestones')
       .select('*, assignee:employees!assignee_employee_id(*)')
       .eq('project_id', projectId)
       .order('planned_start_date', { ascending: true });
 
+    const fallback = MOCK_MILESTONES.filter((m) => m.project_id === projectId);
+    const { data, error } = await fastQuery(query, {
+      data: fallback.length > 0 ? fallback : MOCK_MILESTONES,
+      error: null,
+    } as any);
+
     if (error || !data || data.length === 0) {
-      return { data: MOCK_MILESTONES.filter((m) => m.project_id === projectId) || MOCK_MILESTONES };
+      return { data: fallback.length > 0 ? fallback : MOCK_MILESTONES };
     }
 
     return { data: (data as Milestone[]) || [] };
@@ -383,18 +393,20 @@ export async function archiveMilestone(milestoneId: string): Promise<{ success: 
  */
 export async function fetchDepartmentsList(): Promise<{ data: Department[]; error?: string }> {
   try {
-    const { data, error } = await supabase
+    const query = supabase
       .from('departments')
       .select('*')
       .order('name', { ascending: true });
 
-    if (error) {
-      return { data: [], error: error.message };
+    const { data, error } = await fastQuery(query, { data: MOCK_DEPARTMENTS, error: null } as any);
+
+    if (error || !data || data.length === 0) {
+      return { data: MOCK_DEPARTMENTS };
     }
 
     return { data: (data as Department[]) || [] };
   } catch (err: any) {
-    return { data: [], error: err?.message || 'Failed to fetch departments.' };
+    return { data: MOCK_DEPARTMENTS };
   }
 }
 
@@ -413,15 +425,22 @@ export async function fetchEligibleEmployees(departmentName?: string): Promise<{
       query = query.eq('department', departmentName);
     }
 
-    const { data, error } = await query;
+    const fallback = departmentName
+      ? MOCK_EMPLOYEES.filter((e) => e.is_active && e.department === departmentName)
+      : MOCK_EMPLOYEES.filter((e) => e.is_active);
 
-    if (error) {
-      return { data: [], error: error.message };
+    const { data, error } = await fastQuery(query, {
+      data: fallback.length > 0 ? fallback : MOCK_EMPLOYEES.filter((e) => e.is_active),
+      error: null,
+    } as any);
+
+    if (error || !data || data.length === 0) {
+      return { data: fallback.length > 0 ? fallback : MOCK_EMPLOYEES.filter((e) => e.is_active) };
     }
 
     return { data: (data as Employee[]) || [] };
   } catch (err: any) {
-    return { data: [], error: err?.message || 'Failed to fetch eligible employees.' };
+    return { data: MOCK_EMPLOYEES.filter((e) => e.is_active) };
   }
 }
 
