@@ -53,3 +53,4 @@ frontend/coverage/
 # Supabase local state
 backend/supabase/.branches/
 backend/supabase/.temp/
+

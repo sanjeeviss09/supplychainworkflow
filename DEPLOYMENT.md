@@ -93,3 +93,4 @@ To apply the SCM Flow database schema:
 | **Super Admin** | `AXX09` | `admin123` | Full access across all 12 modules |
 | **SCM Admin** | `EMP-1001` | `admin123` | Department & supplier management, tracking, planning |
 | **SCM Team User** | `EMP-1002` | `admin123` | Delivery execution, delay logging, issue raising |
+
