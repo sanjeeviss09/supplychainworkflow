@@ -47,6 +47,7 @@ Thumbs.db
 
 # Vite & Vitest cache
 .vite/
+*.tsbuildinfo
 coverage/
 frontend/coverage/
 

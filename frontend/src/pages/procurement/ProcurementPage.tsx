@@ -809,3 +809,4 @@ export function ProcurementPage() {
     </div>
   );
 }
+
