@@ -769,34 +769,34 @@ export function ProjectDetailPage() {
       </div>
 
       {/* Modern Executive Project Header Card */}
-      <div className="rounded-xl border border-divider bg-ivory-surface p-5 sm:p-6 shadow-warm-sm">
+      <div className="rounded-2xl border border-divider bg-white p-5 sm:p-6 shadow-warm-sm">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-          <div className="space-y-3 flex-1">
+          <div className="space-y-3 flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-xs font-bold text-forest bg-sage-pale px-2.5 py-0.5 rounded border border-sage/50">
+              <span className="font-mono text-xs font-bold text-forest bg-sage-pale px-2.5 py-0.5 rounded-md border border-sage/40">
                 {project.project_code}
               </span>
-              <Badge variant={project.status === 'active' ? 'success' : 'outline'} className="capitalize text-[11px]">
+              <Badge variant={project.status === 'active' ? 'success' : 'outline'} className="capitalize">
                 {project.status.replace(/_/g, ' ')}
               </Badge>
               {projectKpiMetrics.delayedCount > 0 ? (
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-rose-50 text-rose-800 border border-rose-200">
+                <span className="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
                   <AlertTriangle className="h-3 w-3 mr-1 text-rose-600" />
-                  {projectKpiMetrics.delayedCount} Material Delays Detected
+                  {projectKpiMetrics.delayedCount} Material {projectKpiMetrics.delayedCount === 1 ? 'Delay' : 'Delays'}
                 </span>
               ) : (
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <span className="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                   <CheckCircle2 className="h-3 w-3 mr-1 text-emerald-600" />
-                  Supply Commitments On Schedule
+                  All Commitments On Schedule
                 </span>
               )}
               {isArchived && (
-                <Badge variant="destructive" className="text-[10px]">Read-Only Archive</Badge>
+                <Badge variant="destructive">Read-Only Archive</Badge>
               )}
             </div>
 
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-forest">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-ink-primary">
                 {project.name || project.title}
               </h1>
               {project.description && (
@@ -806,18 +806,18 @@ export function ProjectDetailPage() {
               )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-4 text-xs text-ink-secondary pt-1">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-ink-secondary pt-1">
               <div className="flex items-center space-x-1.5">
                 <Building className="h-3.5 w-3.5 text-forest/70" />
-                <span>Department: <strong className="text-ink-primary">{project.department?.name || 'Supply Chain Management'}</strong></span>
+                <span>Unit: <strong className="text-ink-primary font-semibold">{project.department?.name || 'Supply Chain Management'}</strong></span>
               </div>
               <div className="flex items-center space-x-1.5">
                 <User className="h-3.5 w-3.5 text-forest/70" />
-                <span>Owner: <strong className="text-ink-primary">{project.owner?.full_name || 'Aarav Sharma (SCM Admin)'}</strong></span>
+                <span>Owner: <strong className="text-ink-primary font-semibold">{project.owner?.full_name || 'Aarav Sharma (SCM Admin)'}</strong></span>
               </div>
               <div className="flex items-center space-x-1.5">
                 <Calendar className="h-3.5 w-3.5 text-forest/70" />
-                <span className="font-mono">
+                <span className="font-mono text-[11px] bg-ivory px-2 py-0.5 rounded border border-divider/70">
                   {formatDateIST(project.planned_start_date)} — {formatDateIST(project.planned_end_date)}
                 </span>
               </div>
@@ -826,53 +826,54 @@ export function ProjectDetailPage() {
 
           {/* Telemetry KPI Cards */}
           <div className="grid grid-cols-2 gap-3 shrink-0 sm:w-auto">
-            <div className="rounded-lg border border-divider bg-ivory/60 p-3.5 min-w-[140px]">
+            <div className="rounded-xl border border-divider bg-ivory/70 p-4 min-w-[160px]">
               <span className="text-[10px] text-ink-secondary uppercase tracking-wider block font-semibold">
                 Milestone Progress
               </span>
-              <div className="text-lg font-bold font-mono text-forest mt-0.5">
+              <div className="text-xl font-bold font-mono text-forest mt-1">
                 {progress.displayLabel}
               </div>
-              <div className="mt-1 text-[10px] font-mono text-ink-secondary">
+              <div className="mt-1.5 text-[11px] font-medium text-ink-secondary">
                 {delay.displayText}
               </div>
             </div>
 
-            <div className="rounded-lg border border-divider bg-forest text-white p-3.5 min-w-[140px]">
-              <span className="text-[10px] text-sage-light uppercase tracking-wider block font-semibold">
+            <div className="rounded-xl bg-gradient-to-br from-forest-deep to-forest text-white p-4 min-w-[175px] shadow-warm-sm">
+              <span className="text-[10px] text-emerald-200/80 uppercase tracking-wider block font-semibold">
                 Supply Commitment
               </span>
-              <div className="text-lg font-bold font-mono mt-0.5 truncate">
+              <div className="text-xl font-bold font-mono mt-1 truncate">
                 {formatINR(projectKpiMetrics.totalCommittedValue)}
               </div>
-              <div className="mt-1 text-[10px] text-sage-light">
-                {projectKpiMetrics.totalMaterials} Material Demands
+              <div className="mt-1.5 text-[11px] text-emerald-200/90">
+                {projectKpiMetrics.totalMaterials} Active Material Demands
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Navigation Tabs with Badges */}
-      <div className="border-b border-divider">
-        <nav className="flex space-x-6 text-xs font-medium">
+      {/* Navigation Tabs */}
+      <div className="border-b border-divider overflow-x-auto">
+        <nav className="flex space-x-6 text-xs font-medium min-w-max">
           {[
             {
               id: 'materials',
-              label: 'Materials & Delivery Execution',
-              badge: `${projectKpiMetrics.totalMaterials} Items`,
+              label: 'Materials & Execution',
+              badge: `${projectKpiMetrics.totalMaterials}`,
               badgeClass: 'bg-forest/10 text-forest',
             },
             {
               id: 'milestones',
-              label: 'Milestones Schedule',
+              label: 'Milestones',
               badge: `${milestones.length}`,
               badgeClass: 'bg-sage-pale text-forest',
             },
             {
               id: 'governance',
-              label: 'Project Parameters & Governance',
-              badge: null,
+              label: 'Governance & Attachments',
+              badge: project.attachments?.length ? `${project.attachments.length}` : null,
+              badgeClass: 'bg-ivory text-ink-secondary',
             },
             {
               id: 'members',
@@ -882,14 +883,14 @@ export function ProjectDetailPage() {
             },
             {
               id: 'activity',
-              label: 'Activity & Audit History',
+              label: 'Audit History',
               badge: null,
             },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`pb-3 border-b-2 transition-colors flex items-center space-x-1.5 ${
+              className={`pb-3 border-b-2 transition-colors flex items-center space-x-1.5 whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'border-forest text-forest font-semibold'
                   : 'border-transparent text-ink-secondary hover:text-forest'
@@ -897,7 +898,7 @@ export function ProjectDetailPage() {
             >
               <span>{tab.label}</span>
               {tab.badge && (
-                <span className={`text-[10px] px-1.5 py-0.2 rounded font-mono font-medium ${tab.badgeClass}`}>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono font-semibold ${tab.badgeClass}`}>
                   {tab.badge}
                 </span>
               )}
@@ -908,60 +909,100 @@ export function ProjectDetailPage() {
 
       {/* TAB 1: MATERIALS & DELIVERY EXECUTION (PRIMARY SCM WORKSPACE) */}
       {activeTab === 'materials' && (
-        <div className="space-y-6">
-          {/* Executive Summary Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Card className="border-divider shadow-warm-xs bg-white">
-              <CardContent className="p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-ink-muted">Total Demands</span>
-                  <Boxes className="h-4 w-4 text-forest" />
-                </div>
-                <div className="text-xl font-bold text-forest mt-1">
-                  {projectKpiMetrics.totalMaterials}
-                </div>
-                <span className="text-[10px] text-ink-muted">Across 4 material categories</span>
-              </CardContent>
-            </Card>
+        <div className="space-y-5">
+          {/* Interactive KPI Summary Cards (Click to Filter) */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <button
+              type="button"
+              onClick={() => setMaterialFilterStatus('ALL')}
+              className={`text-left rounded-xl transition-all ${
+                materialFilterStatus === 'ALL' ? 'ring-2 ring-forest/70 shadow-warm-sm' : 'hover:shadow-warm-sm'
+              }`}
+            >
+              <Card className="border-divider bg-white h-full">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-ink-secondary uppercase tracking-wider">Total Demands</span>
+                    <div className="p-2 rounded-lg bg-sage-pale text-forest">
+                      <Boxes className="h-4 w-4" />
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold font-mono text-ink-primary mt-2">
+                    {projectKpiMetrics.totalMaterials}
+                  </div>
+                  <span className="text-[11px] text-ink-muted">Across {categorySummaries.length} categories</span>
+                </CardContent>
+              </Card>
+            </button>
 
-            <Card className="border-divider shadow-warm-xs bg-white">
-              <CardContent className="p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-emerald-700">Fulfilled Materials</span>
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                </div>
-                <div className="text-xl font-bold text-emerald-900 mt-1">
-                  {projectKpiMetrics.deliveredCount}
-                </div>
-                <span className="text-[10px] text-ink-muted">Received & QC cleared</span>
-              </CardContent>
-            </Card>
+            <button
+              type="button"
+              onClick={() => setMaterialFilterStatus(materialFilterStatus === 'DELIVERED' ? 'ALL' : 'DELIVERED')}
+              className={`text-left rounded-xl transition-all ${
+                materialFilterStatus === 'DELIVERED' ? 'ring-2 ring-emerald-500 shadow-warm-sm' : 'hover:shadow-warm-sm'
+              }`}
+            >
+              <Card className="border-divider bg-white h-full">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider">Fulfilled</span>
+                    <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
+                      <CheckCircle2 className="h-4 w-4" />
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold font-mono text-emerald-700 mt-2">
+                    {projectKpiMetrics.deliveredCount}
+                  </div>
+                  <span className="text-[11px] text-ink-muted">Received & QC cleared</span>
+                </CardContent>
+              </Card>
+            </button>
 
-            <Card className="border-divider shadow-warm-xs bg-white">
-              <CardContent className="p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-blue-700">On Track in Transit</span>
-                  <Truck className="h-4 w-4 text-blue-600" />
-                </div>
-                <div className="text-xl font-bold text-blue-900 mt-1">
-                  {projectKpiMetrics.onTrackCount}
-                </div>
-                <span className="text-[10px] text-ink-muted">Within committed ETA</span>
-              </CardContent>
-            </Card>
+            <button
+              type="button"
+              onClick={() => setMaterialFilterStatus(materialFilterStatus === 'ON_TRACK' ? 'ALL' : 'ON_TRACK')}
+              className={`text-left rounded-xl transition-all ${
+                materialFilterStatus === 'ON_TRACK' ? 'ring-2 ring-blue-500 shadow-warm-sm' : 'hover:shadow-warm-sm'
+              }`}
+            >
+              <Card className="border-divider bg-white h-full">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-blue-700 uppercase tracking-wider">On Track</span>
+                    <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
+                      <Truck className="h-4 w-4" />
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold font-mono text-blue-700 mt-2">
+                    {projectKpiMetrics.onTrackCount}
+                  </div>
+                  <span className="text-[11px] text-ink-muted">In transit within ETA</span>
+                </CardContent>
+              </Card>
+            </button>
 
-            <Card className="border-divider shadow-warm-xs bg-white">
-              <CardContent className="p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-rose-700">Delayed Deliveries</span>
-                  <AlertTriangle className="h-4 w-4 text-rose-600" />
-                </div>
-                <div className="text-xl font-bold text-rose-900 mt-1">
-                  {projectKpiMetrics.delayedCount}
-                </div>
-                <span className="text-[10px] text-ink-muted">Escalated in Phase 9</span>
-              </CardContent>
-            </Card>
+            <button
+              type="button"
+              onClick={() => setMaterialFilterStatus(materialFilterStatus === 'DELAYED' ? 'ALL' : 'DELAYED')}
+              className={`text-left rounded-xl transition-all ${
+                materialFilterStatus === 'DELAYED' ? 'ring-2 ring-rose-500 shadow-warm-sm' : 'hover:shadow-warm-sm'
+              }`}
+            >
+              <Card className="border-divider bg-white h-full">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-rose-700 uppercase tracking-wider">Delayed</span>
+                    <div className="p-2 rounded-lg bg-rose-50 text-rose-600">
+                      <AlertTriangle className="h-4 w-4" />
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold font-mono text-rose-700 mt-2">
+                    {projectKpiMetrics.delayedCount}
+                  </div>
+                  <span className="text-[11px] text-ink-muted">Requires supplier follow-up</span>
+                </CardContent>
+              </Card>
+            </button>
           </div>
 
           {/* Product & BOM Management Action Bar */}
@@ -1104,7 +1145,7 @@ export function ProjectDetailPage() {
             </div>
           </div>
 
-          {/* SCM Category Breakdown & Expandable Materials Table */}
+          {/* SCM Category Breakdown & Expandable Materials Table — Redesigned 6-Column Zero-Wrap Layout */}
           <div className="space-y-4">
             {categorySummaries.map((catSummary) => {
               const Icon = catSummary.icon;
@@ -1132,97 +1173,122 @@ export function ProjectDetailPage() {
                 return null;
               }
 
+              const accentBorder =
+                catSummary.category === 'API'
+                  ? 'border-l-purple-500'
+                  : catSummary.category === 'PM'
+                    ? 'border-l-amber-500'
+                    : catSummary.category === 'EXE'
+                      ? 'border-l-blue-500'
+                      : catSummary.category === 'Consumables'
+                        ? 'border-l-teal-500'
+                        : 'border-l-slate-500';
+
+              const iconTone =
+                catSummary.category === 'API'
+                  ? 'bg-purple-50 text-purple-700 border-purple-200/70'
+                  : catSummary.category === 'PM'
+                    ? 'bg-amber-50 text-amber-700 border-amber-200/70'
+                    : catSummary.category === 'EXE'
+                      ? 'bg-blue-50 text-blue-700 border-blue-200/70'
+                      : catSummary.category === 'Consumables'
+                        ? 'bg-teal-50 text-teal-700 border-teal-200/70'
+                        : 'bg-slate-100 text-slate-700 border-slate-200';
+
               return (
                 <Card
                   key={catSummary.category}
-                  className="border-divider shadow-warm-xs overflow-hidden transition-all duration-200"
+                  className={`border border-divider border-l-4 ${accentBorder} shadow-warm-sm overflow-hidden transition-all duration-200`}
                 >
                   {/* Category Header Bar (Clickable to Expand/Collapse) */}
                   <div
                     onClick={() => toggleCategoryExpand(catSummary.category)}
-                    className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-white hover:bg-ivory/40 cursor-pointer transition-colors border-b border-divider/60 select-none"
+                    className="flex flex-col md:flex-row md:items-center justify-between gap-3 px-5 py-4 bg-white hover:bg-ivory/60 cursor-pointer transition-colors select-none"
                   >
-                    <div className="flex items-center space-x-3.5">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-forest/10 text-forest shrink-0">
+                    <div className="flex items-center space-x-3.5 min-w-0">
+                      <div className={`flex h-10 w-10 items-center justify-center rounded-xl border shrink-0 ${iconTone}`}>
                         <Icon className="h-5 w-5" />
                       </div>
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <h3 className="font-semibold text-sm text-forest">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-bold text-sm text-ink-primary tracking-tight">
                             {catSummary.label}
                           </h3>
-                          <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-medium border ${catSummary.badgeClass}`}>
-                            {catSummary.materials.length} Materials
+                          <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border whitespace-nowrap ${catSummary.badgeClass}`}>
+                            {catSummary.materials.length} {catSummary.materials.length === 1 ? 'Item' : 'Items'}
                           </span>
                         </div>
-                        <p className="text-[11px] text-ink-secondary mt-0.5">
+                        <p className="text-xs text-ink-secondary mt-0.5 truncate">
                           {catSummary.description}
                         </p>
                       </div>
                     </div>
 
-                    <div className="mt-3 md:mt-0 flex flex-wrap items-center gap-4 text-xs">
-                      {/* PR & PO Metrics */}
-                      <div className="font-mono text-ink-secondary text-right">
-                        <div>
-                          <strong className="text-ink-primary">{catSummary.prCount} PRs</strong> •{' '}
-                          <strong className="text-ink-primary">{catSummary.poCount} SAP POs</strong>
-                        </div>
-                        <div className="text-[10px] text-ink-muted">
-                          Commitment: {formatINR(catSummary.totalValueINR)}
+                    <div className="flex flex-wrap items-center gap-3 md:gap-5 text-xs shrink-0">
+                      {/* PR, PO & Commitment Pill */}
+                      <div className="flex items-center space-x-3 rounded-lg bg-ivory px-3 py-1.5 border border-divider/80">
+                        <div className="text-right">
+                          <div className="font-mono text-[11px] font-semibold text-ink-primary whitespace-nowrap">
+                            {catSummary.prCount} PR · {catSummary.poCount} SAP PO
+                          </div>
+                          <div className="text-[11px] font-mono text-forest font-bold whitespace-nowrap">
+                            {formatINR(catSummary.totalValueINR)}
+                          </div>
                         </div>
                       </div>
 
-                      {/* Delivery Status & Days Deliverable Pill */}
-                      <div className="min-w-[130px] text-right">
-                        {catSummary.delayedCount > 0 ? (
-                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
-                            <AlertTriangle className="h-3.5 w-3.5 mr-1 text-rose-600" />
+                      {/* Delivery Health Pill */}
+                      <div>
+                        {catSummary.materials.length === 0 ? (
+                          <span className="inline-flex items-center whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-medium bg-ivory text-ink-muted border border-divider">
+                            No items
+                          </span>
+                        ) : catSummary.delayedCount > 0 ? (
+                          <span className="inline-flex items-center whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                            <AlertTriangle className="h-3.5 w-3.5 mr-1 text-rose-600 shrink-0" />
                             {catSummary.delayedCount} Delayed
                           </span>
                         ) : catSummary.deliveredCount === catSummary.materials.length ? (
-                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                            <CheckCircle2 className="h-3.5 w-3.5 mr-1 text-emerald-600" />
+                          <span className="inline-flex items-center whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <CheckCircle2 className="h-3.5 w-3.5 mr-1 text-emerald-600 shrink-0" />
                             100% Delivered
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200">
-                            <Clock className="h-3.5 w-3.5 mr-1 text-blue-600" />
+                          <span className="inline-flex items-center whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                            <Clock className="h-3.5 w-3.5 mr-1 text-blue-600 shrink-0" />
                             {catSummary.nextEtaDays !== null ? `Due in ${catSummary.nextEtaDays}d` : 'On Track'}
                           </span>
                         )}
                       </div>
 
-                      {/* Expand / Collapse Icon */}
-                      <div className="flex items-center space-x-1 text-ink-muted hover:text-forest pl-2">
-                        <span className="text-[11px] font-medium hidden sm:inline">
-                          {isExpanded ? 'Collapse' : 'Expand Details'}
+                      {/* Expand / Collapse Trigger */}
+                      <div className="flex items-center space-x-1 text-ink-secondary hover:text-forest font-medium">
+                        <span className="text-xs hidden sm:inline">
+                          {isExpanded ? 'Hide' : 'Show'}
                         </span>
-                        {isExpanded ? (
-                          <ChevronDown className="h-4 w-4 text-forest transition-transform" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4 text-ink-muted transition-transform" />
-                        )}
+                        <div className="p-1 rounded-md bg-ivory border border-divider/70">
+                          {isExpanded ? (
+                            <ChevronDown className="h-4 w-4 text-forest" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4 text-ink-secondary" />
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Expanded Nested Materials Table */}
+                  {/* Expanded Nested Materials Table — Clean 6-Column Zero-Wrap Architecture */}
                   {isExpanded && (
-                    <div className="p-0 overflow-x-auto bg-ivory/20 animate-fadeIn">
+                    <div className="border-t border-divider bg-white animate-fadeIn">
                       <Table>
                         <TableHeader>
-                          <TableRow className="bg-ivory/70 border-b border-divider">
-                            <TableHead className="text-xs font-semibold text-forest">Material & Code</TableHead>
-                            <TableHead className="text-xs font-semibold text-forest">Milestone Mapping</TableHead>
-                            <TableHead className="text-xs font-semibold text-forest text-right">Demanded vs Delivered</TableHead>
-                            <TableHead className="text-xs font-semibold text-forest">PR Reference</TableHead>
-                            <TableHead className="text-xs font-semibold text-forest">SAP PO Reference</TableHead>
-                            <TableHead className="text-xs font-semibold text-forest">Supplier</TableHead>
-                            <TableHead className="text-xs font-semibold text-forest">Committed ETA</TableHead>
-                            <TableHead className="text-xs font-semibold text-forest text-center">Days Deliverable</TableHead>
-                            <TableHead className="text-xs font-semibold text-forest text-center">Live Status</TableHead>
-                            <TableHead className="text-xs font-semibold text-forest text-right">Action</TableHead>
+                          <TableRow className="bg-ivory/80 hover:bg-ivory/80">
+                            <TableHead className="min-w-[240px]">Product / Material</TableHead>
+                            <TableHead className="w-[155px]">Fulfillment</TableHead>
+                            <TableHead className="w-[175px]">PR & SAP PO</TableHead>
+                            <TableHead className="w-[180px]">Supplier</TableHead>
+                            <TableHead className="w-[190px]">ETA & Deliverable</TableHead>
+                            <TableHead className="w-[175px] text-right">Status & Action</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -1235,173 +1301,180 @@ export function ProjectDetailPage() {
 
                             const percentDelivered =
                               mat.required_quantity > 0
-                                ? Math.round((mat.delivered_quantity / mat.required_quantity) * 100)
+                                ? Math.min(100, Math.round((mat.delivered_quantity / mat.required_quantity) * 100))
                                 : 0;
 
                             return (
-                              <TableRow key={mat.id} className="hover:bg-ivory/40 transition-colors">
-                                {/* Material Code & Name */}
+                              <TableRow key={mat.id} className="group hover:bg-ivory/50 transition-colors">
+                                {/* Col 1: Product / Material + Code + Milestone */}
                                 <TableCell>
-                                  <div className="font-mono font-bold text-xs text-forest">
-                                    {mat.material_code}
-                                  </div>
-                                  <div className="text-xs text-ink-primary font-medium max-w-[220px]">
-                                    {mat.material_name}
-                                  </div>
-                                  {mat.cas_number && (
-                                    <div className="text-[10px] text-ink-muted font-mono">
-                                      CAS: {mat.cas_number}
+                                  <div className="space-y-1">
+                                    <div className="font-semibold text-[13px] text-ink-primary leading-snug">
+                                      {mat.material_name}
                                     </div>
-                                  )}
-                                </TableCell>
-
-                                {/* Milestone */}
-                                <TableCell className="text-xs text-ink-secondary max-w-[150px]">
-                                  {mat.milestone_title}
-                                </TableCell>
-
-                                {/* Demanded vs Delivered */}
-                                <TableCell className="text-right">
-                                  <div className="font-mono text-xs font-bold text-forest">
-                                    {mat.delivered_quantity.toLocaleString()} / {mat.required_quantity.toLocaleString()} {mat.uom}
+                                    <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                                      <span className="font-mono font-semibold text-forest bg-sage-pale/70 px-1.5 py-0.5 rounded border border-sage/30 whitespace-nowrap">
+                                        {mat.material_code}
+                                      </span>
+                                      {mat.cas_number && (
+                                        <span className="font-mono text-ink-muted whitespace-nowrap">
+                                          CAS {mat.cas_number}
+                                        </span>
+                                      )}
+                                      <span className="text-divider">·</span>
+                                      <span className="text-ink-secondary truncate max-w-[180px]" title={mat.milestone_title}>
+                                        {mat.milestone_title}
+                                      </span>
+                                    </div>
                                   </div>
-                                  <div className="w-20 ml-auto mt-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                </TableCell>
+
+                                {/* Col 2: Fulfillment Qty & Progress */}
+                                <TableCell>
+                                  <div className="space-y-1.5">
+                                    <div className="flex items-baseline justify-between gap-2 whitespace-nowrap">
+                                      <span className="font-mono text-xs font-bold text-ink-primary">
+                                        {mat.delivered_quantity.toLocaleString()} / {mat.required_quantity.toLocaleString()}{' '}
+                                        <span className="text-[10px] font-semibold text-ink-muted">{mat.uom}</span>
+                                      </span>
+                                      <span className="font-mono text-[10px] font-semibold text-ink-muted">
+                                        {percentDelivered}%
+                                      </span>
+                                    </div>
+                                    <div className="w-full h-1.5 bg-ivory-muted rounded-full overflow-hidden">
+                                      <div
+                                        className={`h-full rounded-full transition-all ${
+                                          percentDelivered === 100
+                                            ? 'bg-emerald-500'
+                                            : percentDelivered > 0
+                                              ? 'bg-amber-500'
+                                              : 'bg-slate-300'
+                                        }`}
+                                        style={{ width: `${percentDelivered}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                </TableCell>
+
+                                {/* Col 3: PR & SAP PO */}
+                                <TableCell>
+                                  <div className="space-y-1 whitespace-nowrap">
+                                    <div className="flex items-center space-x-1.5">
+                                      <span className="font-mono text-xs font-semibold text-forest">
+                                        {mat.pr_number}
+                                      </span>
+                                      <span className="text-[10px] text-ink-muted bg-ivory px-1.5 py-0.5 rounded border border-divider/70">
+                                        {mat.pr_status}
+                                      </span>
+                                    </div>
+                                    <div className="font-mono text-[11px] text-ink-secondary">
+                                      PO <span className="font-semibold text-ink-primary">{mat.sap_po_number}</span> · L{mat.sap_po_line}
+                                    </div>
+                                  </div>
+                                </TableCell>
+
+                                {/* Col 4: Supplier */}
+                                <TableCell>
+                                  <div className="max-w-[170px]">
                                     <div
-                                      className={`h-full rounded-full ${
-                                        percentDelivered === 100
-                                          ? 'bg-emerald-500'
-                                          : percentDelivered > 0
-                                          ? 'bg-amber-500'
-                                          : 'bg-gray-300'
-                                      }`}
-                                      style={{ width: `${percentDelivered}%` }}
-                                    />
-                                  </div>
-                                </TableCell>
-
-                                {/* PR Reference */}
-                                <TableCell>
-                                  <div className="font-mono text-xs font-semibold text-forest">
-                                    {mat.pr_number}
-                                  </div>
-                                  <span className="text-[10px] text-ink-muted block">
-                                    {mat.pr_status}
-                                  </span>
-                                </TableCell>
-
-                                {/* SAP PO Reference */}
-                                <TableCell>
-                                  <div className="font-mono text-xs font-bold text-forest">
-                                    {mat.sap_po_number}
-                                  </div>
-                                  <span className="text-[10px] text-ink-muted block font-mono">
-                                    Line {mat.sap_po_line}
-                                  </span>
-                                </TableCell>
-
-                                {/* Supplier */}
-                                <TableCell className="text-xs text-ink-primary max-w-[140px] truncate">
-                                  <div>{mat.supplier_name}</div>
-                                  <span className="text-[10px] text-ink-muted font-mono">
-                                    {mat.supplier_code}
-                                  </span>
-                                </TableCell>
-
-                                {/* Committed Date & Current ETA */}
-                                <TableCell className="text-xs font-mono">
-                                  <div className="text-ink-primary">
-                                    {mat.current_expected_date}
-                                  </div>
-                                  {mat.current_expected_date !== mat.original_committed_date && (
-                                    <div className="text-[10px] text-rose-600 line-through">
-                                      Orig: {mat.original_committed_date}
+                                      className="text-xs font-medium text-ink-primary truncate"
+                                      title={mat.supplier_name}
+                                    >
+                                      {mat.supplier_name}
                                     </div>
-                                  )}
+                                    <div className="text-[11px] font-mono text-ink-muted mt-0.5">
+                                      {mat.supplier_code}
+                                    </div>
+                                  </div>
                                 </TableCell>
 
-                                {/* Days Deliverable */}
-                                <TableCell className="text-center font-mono">
-                                  {deliverable.badgeVariant === 'delivered' && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                      <Check className="h-3 w-3 mr-1" />
-                                      {deliverable.text}
-                                    </span>
-                                  )}
-                                  {deliverable.badgeVariant === 'on_track' && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-blue-100 text-blue-800 border border-blue-200">
-                                      <Clock className="h-3 w-3 mr-1" />
-                                      {deliverable.text}
-                                    </span>
-                                  )}
-                                  {deliverable.badgeVariant === 'delayed' && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-300">
-                                      <AlertTriangle className="h-3 w-3 mr-1" />
-                                      {deliverable.text}
-                                    </span>
-                                  )}
-                                  {deliverable.badgeVariant === 'due_today' && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                                      <Clock className="h-3 w-3 mr-1" />
-                                      Due Today
-                                    </span>
-                                  )}
+                                {/* Col 5: ETA & Single-Line Days Deliverable */}
+                                <TableCell>
+                                  <div className="space-y-1.5 whitespace-nowrap">
+                                    <div className="flex items-center space-x-1.5 font-mono text-xs">
+                                      <span className="font-semibold text-ink-primary">
+                                        {mat.current_expected_date}
+                                      </span>
+                                      {mat.current_expected_date !== mat.original_committed_date && (
+                                        <span className="text-[10px] text-rose-500 line-through">
+                                          {mat.original_committed_date}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div>
+                                      {deliverable.badgeVariant === 'delivered' && (
+                                        <span className="inline-flex items-center whitespace-nowrap px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                          <Check className="h-3 w-3 mr-1 shrink-0" />
+                                          {deliverable.text}
+                                        </span>
+                                      )}
+                                      {deliverable.badgeVariant === 'on_track' && (
+                                        <span className="inline-flex items-center whitespace-nowrap px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                          <Clock className="h-3 w-3 mr-1 shrink-0" />
+                                          {deliverable.text}
+                                        </span>
+                                      )}
+                                      {deliverable.badgeVariant === 'delayed' && (
+                                        <span className="inline-flex items-center whitespace-nowrap px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                          <AlertTriangle className="h-3 w-3 mr-1 shrink-0" />
+                                          {deliverable.text}
+                                        </span>
+                                      )}
+                                      {deliverable.badgeVariant === 'due_today' && (
+                                        <span className="inline-flex items-center whitespace-nowrap px-2 py-0.5 rounded-md text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                          <Clock className="h-3 w-3 mr-1 shrink-0" />
+                                          Due Today
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
                                 </TableCell>
 
-                                {/* Live Status */}
-                                <TableCell className="text-center">
-                                  {mat.delivery_status === 'DELIVERED' && (
-                                    <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px]">
-                                      Delivered
-                                    </Badge>
-                                  )}
-                                  {mat.delivery_status === 'ON_TRACK' && (
-                                    <Badge className="bg-blue-100 text-blue-800 border-blue-300 text-[10px]">
-                                      On Track
-                                    </Badge>
-                                  )}
-                                  {mat.delivery_status === 'DELAYED' && (
-                                    <Badge className="bg-rose-100 text-rose-800 border-rose-300 text-[10px]">
-                                      Delayed
-                                    </Badge>
-                                  )}
-                                  {mat.delivery_status === 'PARTIALLY_DELIVERED' && (
-                                    <Badge className="bg-amber-100 text-amber-800 border-amber-300 text-[10px]">
-                                      Partial
-                                    </Badge>
-                                  )}
-                                </TableCell>
-
-                                {/* Quick Action */}
+                                {/* Col 6: Live Status & Always-Visible Action */}
                                 <TableCell className="text-right">
-                                  <div className="flex items-center justify-end space-x-1">
+                                  <div className="flex items-center justify-end gap-2 whitespace-nowrap">
+                                    {mat.delivery_status === 'DELIVERED' && (
+                                      <Badge variant="success">Delivered</Badge>
+                                    )}
+                                    {mat.delivery_status === 'ON_TRACK' && (
+                                      <Badge className="bg-blue-50 text-blue-700 border-blue-200">On Track</Badge>
+                                    )}
+                                    {mat.delivery_status === 'DELAYED' && (
+                                      <Badge variant="destructive">Delayed</Badge>
+                                    )}
+                                    {mat.delivery_status === 'PARTIALLY_DELIVERED' && (
+                                      <Badge variant="warning">Partial</Badge>
+                                    )}
+
                                     {mat.delivery_status === 'DELAYED' ? (
                                       <Button
                                         size="sm"
                                         variant="outline"
                                         onClick={() => navigate('/app/deliveries/issues')}
-                                        className="text-[10px] h-6 px-2 border-rose-300 text-rose-700 hover:bg-rose-50"
+                                        className="h-7 px-2.5 text-[11px] border-rose-200 text-rose-700 hover:bg-rose-50"
                                       >
-                                        View Issue
+                                        Issue
                                       </Button>
                                     ) : (
                                       <Button
                                         size="sm"
                                         variant="outline"
                                         onClick={() => navigate('/app/deliveries')}
-                                        className="text-[10px] h-6 px-2 border-forest/30 text-forest hover:bg-forest/5"
+                                        className="h-7 px-2.5 text-[11px] border-divider text-forest hover:bg-sage-pale/50"
                                       >
-                                        <Truck className="h-2.5 w-2.5 mr-1" />
+                                        <Truck className="h-3 w-3 mr-1" />
                                         Track
                                       </Button>
                                     )}
+
                                     {!isArchived && (
                                       <button
                                         type="button"
                                         onClick={() => handleRemoveMaterial(mat.id, mat.material_code)}
-                                        className="p-1 rounded text-ink-muted hover:text-status-danger hover:bg-rose-50 transition-colors"
+                                        className="p-1.5 rounded-md text-ink-muted opacity-70 group-hover:opacity-100 hover:text-status-danger hover:bg-rose-50 transition-all"
                                         title={`Remove ${mat.material_code}`}
                                       >
-                                        <Trash2 className="h-3 w-3" />
+                                        <Trash2 className="h-3.5 w-3.5" />
                                       </button>
                                     )}
                                   </div>
@@ -1411,8 +1484,8 @@ export function ProjectDetailPage() {
                           })}
                           {filteredMaterials.length === 0 && (
                             <TableRow>
-                              <TableCell colSpan={10} className="text-center py-6 text-ink-muted text-xs">
-                                No materials found matching your selected status or search filter.
+                              <TableCell colSpan={6} className="text-center py-8 text-ink-muted text-xs">
+                                No materials in {catSummary.label} matching your filter.
                               </TableCell>
                             </TableRow>
                           )}

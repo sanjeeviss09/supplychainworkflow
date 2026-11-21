@@ -125,33 +125,63 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Hero Banner — Forest Green & Warm Ivory */}
-      <div className="rounded-xl border border-divider bg-ivory-surface p-5 sm:p-6 shadow-warm-sm">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      {/* Executive Hero Banner — Rich Forest Emerald Gradient */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-forest-deep via-forest to-forest-light p-6 sm:p-7 text-white shadow-warm-lg">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-emerald-400/10 blur-2xl" />
+        <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
           <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-[11px] font-bold text-forest uppercase tracking-wider">
-                Enterprise SCM Platform
+            <div className="flex flex-wrap items-center gap-2 text-[11px]">
+              <span className="inline-flex items-center space-x-1.5 rounded-full bg-white/10 border border-white/15 px-2.5 py-0.5 font-semibold text-emerald-200">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                <span>Enterprise SCM Platform</span>
               </span>
-              <span className="text-divider">•</span>
-              <span className="text-xs text-ink-secondary">Internal Deployment</span>
+              <span className="text-emerald-200/70 font-mono">INR (₹) · Asia/Kolkata (IST)</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-forest mt-1">
-              Welcome, {employee?.full_name || user?.email?.split('@')[0]}
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mt-2.5">
+              Welcome back, {employee?.full_name || user?.email?.split('@')[0]}
             </h1>
-            <p className="text-xs text-ink-secondary mt-1 max-w-2xl leading-relaxed">
-              Employee ID: <strong className="text-ink-primary font-mono">{employee?.employee_id || 'System User'}</strong> • Department: <span className="text-ink-primary font-medium">{employee?.department || 'Operations'}</span> • Designation: <span className="text-ink-primary font-medium">{employee?.designation || 'Staff'}</span> • Role:{' '}
-              <span className="font-semibold text-forest capitalize">{role?.replace(/_/g, ' ')}</span>
+            <p className="text-xs text-emerald-100/80 mt-1.5 max-w-2xl leading-relaxed">
+              <span className="font-mono font-semibold text-white">{employee?.employee_id || 'System User'}</span>
+              {' · '}
+              <span>{employee?.department || 'Operations'}</span>
+              {' · '}
+              <span>{employee?.designation || 'Staff'}</span>
+              {' · '}
+              <span className="capitalize text-emerald-200 font-semibold">{role?.replace(/_/g, ' ')}</span>
             </p>
           </div>
 
-          <div className="flex items-center space-x-2 shrink-0">
-            <div className="rounded-lg border border-divider bg-ivory px-3 py-2 text-right">
-              <span className="text-[10px] text-ink-secondary uppercase tracking-wider block font-semibold">Active Base</span>
-              <span className="text-xs font-mono font-bold text-forest">
-                INR (₹) • Asia/Kolkata
-              </span>
-            </div>
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            {permissions.includes('projects.create') && (
+              <Button asChild size="sm" className="bg-white text-forest hover:bg-emerald-50 font-semibold shadow-sm">
+                <Link to="/app/projects/new">
+                  <FolderKanban className="h-3.5 w-3.5 mr-1.5" />
+                  New Project
+                </Link>
+              </Button>
+            )}
+            <Button
+              asChild
+              size="sm"
+              variant="outline"
+              className="border-white/25 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+            >
+              <Link to="/app/deliveries">
+                <Truck className="h-3.5 w-3.5 mr-1.5" />
+                Track Deliveries
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="sm"
+              variant="outline"
+              className="border-white/25 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+            >
+              <Link to="/app/deliveries/issues">
+                <AlertTriangle className="h-3.5 w-3.5 mr-1.5" />
+                Issues
+              </Link>
+            </Button>
           </div>
         </div>
       </div>

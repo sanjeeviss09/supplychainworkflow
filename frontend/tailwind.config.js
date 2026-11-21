@@ -26,41 +26,48 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+      },
       colors: {
-        // Core Approved Theme Tokens
+        // Refined Executive SaaS Palette (mapped cleanly to existing tokens)
         forest: {
           DEFAULT: '#0B3B2E',
-          deep: '#082D24',
-          hover: '#0E4839',
-          light: '#1B5B49',
-          muted: '#144637',
+          deep: '#07281F',
+          hover: '#104D3C',
+          light: '#175E4B',
+          muted: '#134A3B',
         },
         ivory: {
-          DEFAULT: '#F7F3EA',
-          surface: '#FFFEFA',
-          muted: '#EFECE2',
+          DEFAULT: '#F5F7F6', // Crisp Alabaster Slate Canvas
+          surface: '#FFFFFF', // Pure Crisp White Card Surface
+          muted: '#EDF1EF',
+          hover: '#F0F4F2',
         },
         sage: {
-          DEFAULT: '#A9BE98',
-          pale: '#E8EEDD',
-          hover: '#98AE87',
-          dark: '#5D734C',
+          DEFAULT: '#84B89B',
+          pale: '#E9F3EE',
+          hover: '#72A88A',
+          dark: '#356E55',
+          light: '#BCE0CD',
         },
         copper: {
-          DEFAULT: '#B85C1E',
-          pale: '#F8E8D5',
-          hover: '#A34F18',
-          dark: '#8C3F0F',
+          DEFAULT: '#C25E1A',
+          pale: '#FDF1E8',
+          hover: '#A84E12',
+          dark: '#92400E',
         },
         ink: {
-          primary: '#182820',
-          secondary: '#5E6B61',
-          muted: '#7A887E',
+          primary: '#111F1A',
+          secondary: '#4E5F58',
+          muted: '#7B8B84',
         },
-        divider: '#DEDCCF',
-        'status-success': '#2F7D4A',
-        'status-warning': '#A85A12',
-        'status-danger': '#B42318',
+        divider: '#E2E8E5',
+        'status-success': '#15803D',
+        'status-warning': '#B45309',
+        'status-danger': '#DC2626',
+        'status-error': '#DC2626',
 
         // Standard shadcn semantic tokens mapped to theme
         border: 'hsl(var(--border))',
@@ -98,15 +105,17 @@ export default {
         },
       },
       borderRadius: {
+        xl: '0.875rem',
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
       boxShadow: {
-        'warm-sm': '0 1px 2px 0 rgba(24, 40, 32, 0.05)',
-        'warm-md': '0 4px 6px -1px rgba(24, 40, 32, 0.07), 0 2px 4px -2px rgba(24, 40, 32, 0.05)',
-        'warm-lg': '0 10px 15px -3px rgba(24, 40, 32, 0.08), 0 4px 6px -4px rgba(24, 40, 32, 0.04)',
-        'warm-xl': '0 20px 25px -5px rgba(24, 40, 32, 0.1), 0 8px 10px -6px rgba(24, 40, 32, 0.05)',
+        'warm-xs': '0 1px 2px 0 rgba(11, 59, 46, 0.04)',
+        'warm-sm': '0 1px 3px 0 rgba(11, 59, 46, 0.05), 0 1px 2px -1px rgba(11, 59, 46, 0.04)',
+        'warm-md': '0 4px 12px -2px rgba(11, 59, 46, 0.07), 0 2px 4px -2px rgba(11, 59, 46, 0.04)',
+        'warm-lg': '0 12px 24px -4px rgba(11, 59, 46, 0.09), 0 4px 8px -4px rgba(11, 59, 46, 0.04)',
+        'warm-xl': '0 20px 32px -6px rgba(11, 59, 46, 0.12), 0 8px 12px -6px rgba(11, 59, 46, 0.05)',
       },
     },
   },
