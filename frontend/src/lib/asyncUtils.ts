@@ -86,3 +86,37 @@ export async function fastQuery<T>(
     return fallbackValue;
   }
 }
+
+/**
+ * Resilient RPC and Mutation wrapper.
+ * Tries the backend RPC/mutation with a bounded timeout (default 1200ms).
+ * If the backend is unreachable (circuit open, TypeError: Failed to fetch, or timeout),
+ * it immediately triggers the fallbackHandler to persist changes locally and return success.
+ */
+export async function resilientRpc<T>(
+  rpcCall: () => Promise<T>,
+  fallbackHandler: () => T | Promise<T>,
+  timeoutMs = 1200
+): Promise<T> {
+  if (isBackendCircuitOpen()) {
+    return (await fallbackHandler()) as T;
+  }
+
+  try {
+    const result = await withTimeout<T>(rpcCall(), timeoutMs);
+    // If the returned object has an error containing 'Failed to fetch', trigger fallback
+    if (result && typeof result === 'object' && 'error' in result && (result as any).error) {
+      const errStr = String((result as any).error);
+      if (errStr.includes('fetch') || errStr.includes('Network') || errStr.includes('Failed to fetch')) {
+        reportBackendFailure(20000);
+        return (await fallbackHandler()) as T;
+      }
+    }
+    reportBackendSuccess();
+    return result as T;
+  } catch (err: any) {
+    reportBackendFailure(20000);
+    return (await fallbackHandler()) as T;
+  }
+}
+

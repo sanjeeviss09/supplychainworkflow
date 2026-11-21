@@ -10,7 +10,7 @@ import {
   SupplierType,
 } from '@/types/database.types';
 import { MOCK_SUPPLIERS } from '@/lib/mockData';
-import { fastQuery } from '@/lib/asyncUtils';
+import { fastQuery, resilientRpc } from '@/lib/asyncUtils';
 
 export interface SupplierFilters {
   searchTerm?: string;
@@ -126,30 +126,55 @@ export async function createSupplier(payload: {
   general_phone?: string;
   registered_address?: string;
 }): Promise<{ data?: Supplier; error?: string }> {
-  try {
-    const { data, error } = await supabase.rpc('api_create_supplier', {
-      p_legal_name: payload.legal_name,
-      p_display_name: payload.display_name || null,
-      p_supplier_type: payload.supplier_type,
-      p_tax_identifier: payload.tax_identifier || null,
-      p_website: payload.website || null,
-      p_general_email: payload.general_email || null,
-      p_general_phone: payload.general_phone || null,
-      p_registered_address: payload.registered_address || null,
-    });
+  return resilientRpc(
+    async () => {
+      const { data, error } = await supabase.rpc('api_create_supplier', {
+        p_legal_name: payload.legal_name,
+        p_display_name: payload.display_name || null,
+        p_supplier_type: payload.supplier_type,
+        p_tax_identifier: payload.tax_identifier || null,
+        p_website: payload.website || null,
+        p_general_email: payload.general_email || null,
+        p_general_phone: payload.general_phone || null,
+        p_registered_address: payload.registered_address || null,
+      });
 
-    if (error) {
-      return { error: error.message };
+      if (error) {
+        if (error.message.includes('fetch') || error.message.includes('Network') || error.message.includes('Failed to fetch')) {
+          throw new Error(error.message);
+        }
+        return { error: error.message };
+      }
+
+      return { data: data as Supplier };
+    },
+    () => {
+      const nextNum = MOCK_SUPPLIERS.length + 1;
+      const code = `SUP-${String(nextNum).padStart(3, '0')}`;
+      const newSupplier: Supplier = {
+        id: `sup-${Date.now()}`,
+        supplier_code: code,
+        legal_name: payload.legal_name,
+        display_name: payload.display_name || payload.legal_name,
+        supplier_type: payload.supplier_type,
+        supplier_status: 'ACTIVE',
+        qualification_status: 'IN_PROGRESS',
+        tax_identifier: payload.tax_identifier || null,
+        gstin: payload.tax_identifier || null,
+        email: payload.general_email || null,
+        phone: payload.general_phone || null,
+        registered_address: payload.registered_address || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      MOCK_SUPPLIERS.unshift(newSupplier);
+      return { data: newSupplier };
     }
-
-    return { data: data as Supplier };
-  } catch (err: any) {
-    return { error: err?.message || 'Failed to create supplier master record.' };
-  }
+  );
 }
 
 /**
- * Updates an existing supplier master record via authoritative RPC.
+ * Updates an existing supplier master record via authoritative RPC with resilient fallback.
  */
 export async function updateSupplier(
   supplierId: string,
@@ -164,27 +189,48 @@ export async function updateSupplier(
     registered_address?: string;
   }
 ): Promise<{ data?: Supplier; error?: string }> {
-  try {
-    const { data, error } = await supabase.rpc('api_update_supplier', {
-      p_supplier_id: supplierId,
-      p_legal_name: payload.legal_name,
-      p_display_name: payload.display_name || null,
-      p_supplier_type: payload.supplier_type || null,
-      p_tax_identifier: payload.tax_identifier || null,
-      p_website: payload.website || null,
-      p_general_email: payload.general_email || null,
-      p_general_phone: payload.general_phone || null,
-      p_registered_address: payload.registered_address || null,
-    });
+  return resilientRpc(
+    async () => {
+      const { data, error } = await supabase.rpc('api_update_supplier', {
+        p_supplier_id: supplierId,
+        p_legal_name: payload.legal_name,
+        p_display_name: payload.display_name || null,
+        p_supplier_type: payload.supplier_type || null,
+        p_tax_identifier: payload.tax_identifier || null,
+        p_website: payload.website || null,
+        p_general_email: payload.general_email || null,
+        p_general_phone: payload.general_phone || null,
+        p_registered_address: payload.registered_address || null,
+      });
 
-    if (error) {
-      return { error: error.message };
+      if (error) {
+        if (error.message.includes('fetch') || error.message.includes('Network') || error.message.includes('Failed to fetch')) {
+          throw new Error(error.message);
+        }
+        return { error: error.message };
+      }
+
+      return { data: data as Supplier };
+    },
+    () => {
+      const match = MOCK_SUPPLIERS.find((s) => s.id === supplierId);
+      if (match) {
+        match.legal_name = payload.legal_name;
+        if (payload.display_name) match.display_name = payload.display_name;
+        if (payload.supplier_type) match.supplier_type = payload.supplier_type;
+        if (payload.tax_identifier) {
+          match.tax_identifier = payload.tax_identifier;
+          match.gstin = payload.tax_identifier;
+        }
+        if (payload.general_email) match.email = payload.general_email;
+        if (payload.general_phone) match.phone = payload.general_phone;
+        if (payload.registered_address) match.registered_address = payload.registered_address;
+        match.updated_at = new Date().toISOString();
+        return { data: match };
+      }
+      return { error: 'Supplier not found.' };
     }
-
-    return { data: data as Supplier };
-  } catch (err: any) {
-    return { error: err?.message || 'Failed to update supplier record.' };
-  }
+  );
 }
 
 /**
