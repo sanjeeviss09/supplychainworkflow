@@ -10,10 +10,12 @@ import {
   changeProjectOwner,
   archiveProject,
   fetchEligibleEmployees,
+  saveProjectAttachments,
 } from '@/services/projectService';
+import { ProjectAttachmentUploader } from '@/components/projects/ProjectAttachmentUploader';
 import { fetchAuditLogs } from '@/services/auditService';
 import { calculateProjectDelay, calculateProjectProgress } from '@/lib/projectCalculations';
-import { AuditLog, Employee, Milestone, Project, ProjectMember } from '@/types/database.types';
+import { AuditLog, Employee, Milestone, Project, ProjectAttachment, ProjectMember } from '@/types/database.types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -1414,6 +1416,28 @@ export function ProjectDetailPage() {
                   )}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Project Documents & Attachments Card */}
+          <Card className="border-divider shadow-warm-sm md:col-span-2">
+            <CardHeader className="pb-3 border-b border-divider/60 bg-ivory/30">
+              <CardTitle className="text-sm font-semibold text-forest">
+                Project Reference Documents & Attachments ({project.attachments?.length || 0})
+              </CardTitle>
+              <CardDescription className="text-xs text-ink-secondary">
+                Upload or download scope specifications, PDFs, Word documents, Excel BOMs, and regulatory files linked to this project.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <ProjectAttachmentUploader
+                attachments={project.attachments || []}
+                onChange={(next: ProjectAttachment[]) => {
+                  saveProjectAttachments(project.id, next);
+                  setProject({ ...project, attachments: next });
+                }}
+                readOnly={isArchived}
+              />
             </CardContent>
           </Card>
         </div>

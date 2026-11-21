@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { fetchProjectById, updateProject } from '@/services/projectService';
-import { Project, ProjectStatus } from '@/types/database.types';
+import { Project, ProjectAttachment, ProjectStatus } from '@/types/database.types';
+import { ProjectAttachmentUploader } from '@/components/projects/ProjectAttachmentUploader';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,7 @@ export function ProjectEditPage() {
   const [plannedStartDate, setPlannedStartDate] = useState('');
   const [plannedEndDate, setPlannedEndDate] = useState('');
   const [actualCompletionDate, setActualCompletionDate] = useState('');
+  const [attachments, setAttachments] = useState<ProjectAttachment[]>([]);
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
@@ -39,6 +41,7 @@ export function ProjectEditPage() {
           setPlannedStartDate(res.data.planned_start_date ? res.data.planned_start_date.split('T')[0] : '');
           setPlannedEndDate(res.data.planned_end_date ? res.data.planned_end_date.split('T')[0] : '');
           setActualCompletionDate(res.data.actual_completion_date ? res.data.actual_completion_date.split('T')[0] : '');
+          setAttachments(res.data.attachments || []);
         } else if (res.error) {
           setServerError(res.error);
         }
@@ -94,6 +97,7 @@ export function ProjectEditPage() {
       planned_start_date: plannedStartDate,
       planned_end_date: plannedEndDate,
       actual_completion_date: status === 'completed' ? actualCompletionDate : null,
+      attachments,
     });
     setIsSubmitting(false);
 
@@ -211,6 +215,16 @@ export function ProjectEditPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   disabled={isSubmitting}
                   className="w-full rounded-md border border-divider bg-ivory-surface p-2.5 text-xs text-ink-primary placeholder:text-ink-muted/70 focus:outline-none focus:border-forest focus:ring-1 focus:ring-forest transition-colors"
+                />
+              </div>
+
+              {/* Project Attachments */}
+              <div className="space-y-1.5">
+                <Label>Project Documents & Attachments</Label>
+                <ProjectAttachmentUploader
+                  attachments={attachments}
+                  onChange={setAttachments}
+                  disabled={isSubmitting}
                 />
               </div>
 

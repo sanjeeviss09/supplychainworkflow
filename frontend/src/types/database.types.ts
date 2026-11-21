@@ -150,6 +150,17 @@ export interface Department {
   created_at: string;
 }
 
+export interface ProjectAttachment {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  extension: string;
+  uploaded_at: string;
+  uploaded_by?: string;
+  data_url?: string;
+}
+
 export interface Project {
   id: string;
   project_code: string;
@@ -173,6 +184,7 @@ export interface Project {
   archived_by?: string | null;
   department?: Department | null;
   owner?: Employee | null;
+  attachments?: ProjectAttachment[];
 }
 
 export interface ProjectMember {

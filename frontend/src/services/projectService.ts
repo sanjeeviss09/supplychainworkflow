@@ -5,11 +5,85 @@ import {
   Milestone,
   MilestoneStatus,
   Project,
+  ProjectAttachment,
   ProjectMember,
   ProjectStatus,
 } from '@/types/database.types';
 import { MOCK_PROJECTS, MOCK_MILESTONES, MOCK_DEPARTMENTS, MOCK_EMPLOYEES } from '@/lib/mockData';
 import { fastQuery, resilientRpc } from '@/lib/asyncUtils';
+
+const PROJECT_ATTACHMENTS_STORAGE_KEY = 'scm_flow_project_attachments_v1';
+
+function loadAllStoredAttachments(): Record<string, ProjectAttachment[]> {
+  try {
+    const raw = localStorage.getItem(PROJECT_ATTACHMENTS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function getStoredProjectAttachments(projectId: string): ProjectAttachment[] {
+  const all = loadAllStoredAttachments();
+  return all[projectId] || [];
+}
+
+export function saveProjectAttachments(projectId: string, attachments: ProjectAttachment[]): void {
+  try {
+    const all = loadAllStoredAttachments();
+    all[projectId] = attachments;
+    localStorage.setItem(PROJECT_ATTACHMENTS_STORAGE_KEY, JSON.stringify(all));
+  } catch {
+    // Ignore storage quota errors for very large files; keep in-memory on MOCK_PROJECTS
+  }
+  const match = MOCK_PROJECTS.find((p) => p.id === projectId);
+  if (match) {
+    match.attachments = attachments;
+  }
+}
+
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+export async function filesToProjectAttachments(
+  files: File[],
+  uploadedBy?: string
+): Promise<ProjectAttachment[]> {
+  const results: ProjectAttachment[] = [];
+  for (const file of files) {
+    const ext = file.name.includes('.') ? file.name.split('.').pop()?.toUpperCase() || 'FILE' : 'FILE';
+    let dataUrl: string | undefined;
+    try {
+      if (file.size <= 3 * 1024 * 1024) {
+        dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result));
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(file);
+        });
+      } else {
+        dataUrl = URL.createObjectURL(file);
+      }
+    } catch {
+      dataUrl = URL.createObjectURL(file);
+    }
+
+    results.push({
+      id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      name: file.name,
+      size: file.size,
+      type: file.type || 'application/octet-stream',
+      extension: ext,
+      uploaded_at: new Date().toISOString(),
+      uploaded_by: uploadedBy || 'System User',
+      data_url: dataUrl,
+    });
+  }
+  return results;
+}
 
 export interface ProjectFilters {
   searchTerm?: string;
@@ -116,13 +190,32 @@ export async function fetchProjectById(projectId: string): Promise<{ data?: Proj
     const { data, error } = await fastQuery(singleQuery, { data: match, error: null } as any);
 
     if (error || !data) {
-      return { data: match };
+      const stored = getStoredProjectAttachments(match.id);
+      return {
+        data: {
+          ...match,
+          attachments: stored.length > 0 ? stored : match.attachments || [],
+        },
+      };
     }
 
-    return { data: data as Project };
+    const proj = data as Project;
+    const stored = getStoredProjectAttachments(proj.id);
+    return {
+      data: {
+        ...proj,
+        attachments: stored.length > 0 ? stored : proj.attachments || [],
+      },
+    };
   } catch (err: any) {
     const match = MOCK_PROJECTS.find((p) => p.id === projectId) || MOCK_PROJECTS[0];
-    return { data: match };
+    const stored = getStoredProjectAttachments(match.id);
+    return {
+      data: {
+        ...match,
+        attachments: stored.length > 0 ? stored : match.attachments || [],
+      },
+    };
   }
 }
 
@@ -133,6 +226,7 @@ export interface CreateProjectPayload {
   owner_employee_id: string;
   planned_start_date: string;
   planned_end_date: string;
+  attachments?: ProjectAttachment[];
 }
 
 /**
@@ -158,6 +252,9 @@ export async function createProject(payload: CreateProjectPayload): Promise<{ da
       }
 
       if (data && data.project_id) {
+        if (payload.attachments && payload.attachments.length > 0) {
+          saveProjectAttachments(data.project_id, payload.attachments);
+        }
         return fetchProjectById(data.project_id);
       }
 
@@ -169,6 +266,7 @@ export async function createProject(payload: CreateProjectPayload): Promise<{ da
       const newId = `prj-${Date.now()}`;
       const nextNum = MOCK_PROJECTS.length + 1;
       const projectCode = `PRJ-2026-${String(nextNum).padStart(3, '0')}`;
+      const projectAttachments = payload.attachments || [];
 
       const newProject: Project = {
         id: newId,
@@ -187,9 +285,13 @@ export async function createProject(payload: CreateProjectPayload): Promise<{ da
         updated_at: new Date().toISOString(),
         department: dept,
         owner: owner,
+        attachments: projectAttachments,
       };
 
       MOCK_PROJECTS.unshift(newProject);
+      if (projectAttachments.length > 0) {
+        saveProjectAttachments(newId, projectAttachments);
+      }
       return { data: newProject };
     }
   );
@@ -202,6 +304,7 @@ export interface UpdateProjectPayload {
   planned_start_date: string;
   planned_end_date: string;
   actual_completion_date?: string | null;
+  attachments?: ProjectAttachment[];
 }
 
 /**
@@ -230,6 +333,10 @@ export async function updateProject(
         return { error: error.message };
       }
 
+      if (payload.attachments !== undefined) {
+        saveProjectAttachments(projectId, payload.attachments);
+      }
+
       return fetchProjectById(projectId);
     },
     () => {
@@ -242,6 +349,10 @@ export async function updateProject(
         match.planned_start_date = payload.planned_start_date;
         match.planned_end_date = payload.planned_end_date;
         match.actual_completion_date = payload.actual_completion_date || null;
+        if (payload.attachments !== undefined) {
+          match.attachments = payload.attachments;
+          saveProjectAttachments(projectId, payload.attachments);
+        }
         match.updated_at = new Date().toISOString();
         return { data: match };
       }

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { createProject, fetchDepartmentsList, fetchEligibleEmployees } from '@/services/projectService';
-import { Department, Employee } from '@/types/database.types';
+import { Department, Employee, ProjectAttachment } from '@/types/database.types';
+import { ProjectAttachmentUploader } from '@/components/projects/ProjectAttachmentUploader';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +21,7 @@ export function ProjectCreatePage() {
   const [ownerEmployeeId, setOwnerEmployeeId] = useState('');
   const [plannedStartDate, setPlannedStartDate] = useState('');
   const [plannedEndDate, setPlannedEndDate] = useState('');
+  const [attachments, setAttachments] = useState<ProjectAttachment[]>([]);
 
   const [departments, setDepartments] = useState<Department[]>([]);
   const [eligibleEmployees, setEligibleEmployees] = useState<Employee[]>([]);
@@ -116,6 +118,7 @@ export function ProjectCreatePage() {
       owner_employee_id: ownerEmployeeId,
       planned_start_date: plannedStartDate,
       planned_end_date: plannedEndDate,
+      attachments,
     });
     setIsSubmitting(false);
 
@@ -204,6 +207,17 @@ export function ProjectCreatePage() {
                 onChange={(e) => setDescription(e.target.value)}
                 disabled={isSubmitting}
                 className="w-full rounded-md border border-divider bg-ivory-surface p-2.5 text-xs text-ink-primary placeholder:text-ink-muted/70 focus:outline-none focus:border-forest focus:ring-1 focus:ring-forest transition-colors"
+              />
+            </div>
+
+            {/* Project Attachments (PDF, Word, Excel, Images, etc.) */}
+            <div className="space-y-1.5">
+              <Label>Project Documents & Attachments</Label>
+              <ProjectAttachmentUploader
+                attachments={attachments}
+                onChange={setAttachments}
+                uploadedBy={employee?.full_name || employee?.employee_id || 'SCM User'}
+                disabled={isSubmitting}
               />
             </div>
 
