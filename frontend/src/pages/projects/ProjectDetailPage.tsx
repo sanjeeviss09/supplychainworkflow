@@ -13,6 +13,15 @@ import {
   saveProjectAttachments,
 } from '@/services/projectService';
 import { ProjectAttachmentUploader } from '@/components/projects/ProjectAttachmentUploader';
+import {
+  AddProjectMaterialModal,
+  BulkUploadProjectMaterialsModal,
+} from '@/components/projects/ProjectMaterialsModals';
+import {
+  loadProjectMaterials,
+  saveProjectMaterials,
+  downloadProjectMaterialsExcelTemplate,
+} from '@/lib/projectMaterialsExcel';
 import { fetchAuditLogs } from '@/services/auditService';
 import { calculateProjectDelay, calculateProjectProgress } from '@/lib/projectCalculations';
 import { AuditLog, Employee, Milestone, Project, ProjectAttachment, ProjectMember } from '@/types/database.types';
@@ -61,6 +70,8 @@ import {
   Boxes,
   Check,
   XCircle,
+  Download,
+  Upload,
 } from 'lucide-react';
 import { formatDateIST, formatINR } from '@/lib/formatters';
 
@@ -174,11 +185,17 @@ export function ProjectDetailPage() {
     PM: true,
     EXE: false,
     Consumables: false,
+    Other: true,
   });
 
   // Filter state for materials within the category drilldown
   const [materialFilterStatus, setMaterialFilterStatus] = useState<'ALL' | 'ON_TRACK' | 'DELAYED' | 'DELIVERED'>('ALL');
   const [materialSearchQuery, setMaterialSearchQuery] = useState('');
+
+  // Add Product One-by-One & Excel Bulk Upload Modal State
+  const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
+  const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
+  const [materialToast, setMaterialToast] = useState<string | null>(null);
 
   // Modals for Owner and Member Management
   const [selectedNewOwner, setSelectedNewOwner] = useState('');
@@ -234,8 +251,8 @@ export function ProjectDetailPage() {
     loadData();
   }, [projectId]);
 
-  // Project Materials and Delivery Tracking Dataset
-  const projectMaterials: ProjectMaterialItem[] = useMemo(() => {
+  // Default Demo Project Materials Seed (used for demo projects prj-001..003)
+  const defaultDemoMaterials: ProjectMaterialItem[] = useMemo(() => {
     return [
       {
         id: 'pmat-001',
@@ -432,6 +449,49 @@ export function ProjectDetailPage() {
     ];
   }, []);
 
+  const [projectMaterials, setProjectMaterials] = useState<ProjectMaterialItem[]>([]);
+
+  useEffect(() => {
+    if (!projectId) return;
+    setProjectMaterials(loadProjectMaterials(projectId, defaultDemoMaterials));
+  }, [projectId, defaultDemoMaterials]);
+
+  const showToast = (msg: string) => {
+    setMaterialToast(msg);
+    setTimeout(() => setMaterialToast(null), 4000);
+  };
+
+  const handleAddSingleMaterial = (newItem: ProjectMaterialItem) => {
+    if (!projectId) return;
+    const next = [newItem, ...projectMaterials];
+    setProjectMaterials(next);
+    saveProjectMaterials(projectId, next);
+    setExpandedCategories((prev) => ({ ...prev, [newItem.category]: true }));
+    showToast(`Added "${newItem.material_code} — ${newItem.material_name}" to ${newItem.category}.`);
+  };
+
+  const handleBulkImportMaterials = (items: ProjectMaterialItem[], mode: 'append' | 'replace') => {
+    if (!projectId) return;
+    const next = mode === 'replace' ? items : [...items, ...projectMaterials];
+    setProjectMaterials(next);
+    saveProjectMaterials(projectId, next);
+    const expandedPatch: Record<string, boolean> = {};
+    items.forEach((it) => {
+      expandedPatch[it.category] = true;
+    });
+    setExpandedCategories((prev) => ({ ...prev, ...expandedPatch }));
+    showToast(`Imported ${items.length} product(s) from Excel/CSV into project.`);
+  };
+
+  const handleRemoveMaterial = (matId: string, matCode: string) => {
+    if (!projectId) return;
+    if (!window.confirm(`Remove material "${matCode}" from this project?`)) return;
+    const next = projectMaterials.filter((m) => m.id !== matId);
+    setProjectMaterials(next);
+    saveProjectMaterials(projectId, next);
+    showToast(`Removed "${matCode}" from project.`);
+  };
+
   // Category Summaries Computation
   const categorySummaries: MaterialCategorySummary[] = useMemo(() => {
     const categories: Array<{
@@ -474,6 +534,18 @@ export function ProjectDetailPage() {
         badgeClass: 'bg-teal-100 text-teal-900 border-teal-200',
         defaultUom: 'NOS',
       },
+      ...(projectMaterials.some((m) => m.category === 'Other')
+        ? [
+            {
+              category: 'Other' as const,
+              label: 'Other Project Materials',
+              description: 'Custom equipment, utilities & auxiliary supply items',
+              icon: Boxes,
+              badgeClass: 'bg-slate-100 text-slate-900 border-slate-200',
+              defaultUom: 'UNITS',
+            },
+          ]
+        : []),
     ];
 
     return categories.map((cat) => {
@@ -892,6 +964,106 @@ export function ProjectDetailPage() {
             </Card>
           </div>
 
+          {/* Product & BOM Management Action Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 rounded-lg border border-divider shadow-warm-xs">
+            <div>
+              <h3 className="text-sm font-bold text-forest">Project Products & Material Requirements</h3>
+              <p className="text-[11px] text-ink-secondary">
+                Add products one-by-one or download the Excel template to bulk upload your project BOM.
+              </p>
+            </div>
+            {!isArchived && (
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => setShowAddMaterialModal(true)}
+                  className="h-8 text-xs bg-forest hover:bg-forest-deep text-white shadow-xs"
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  Add Product
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => downloadProjectMaterialsExcelTemplate(project.project_code)}
+                  className="h-8 text-xs border-forest/30 text-forest hover:bg-forest/5"
+                >
+                  <Download className="h-3.5 w-3.5 mr-1" />
+                  Excel Template
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowBulkUploadModal(true)}
+                  className="h-8 text-xs border-forest/30 text-forest hover:bg-forest/5"
+                >
+                  <Upload className="h-3.5 w-3.5 mr-1" />
+                  Upload Excel / CSV
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {materialToast && (
+            <div className="flex items-center space-x-2 rounded-lg bg-emerald-50 border border-emerald-200 px-3.5 py-2.5 text-xs text-emerald-900 shadow-xs">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              <span className="font-medium">{materialToast}</span>
+            </div>
+          )}
+
+          {/* Empty state when project has no products yet */}
+          {projectMaterials.length === 0 && (
+            <Card className="border-2 border-dashed border-divider bg-ivory/40">
+              <CardContent className="py-10 text-center space-y-3">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-forest/10 text-forest">
+                  <Boxes className="h-6 w-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-forest">No products added to {project.project_code} yet</h4>
+                  <p className="text-xs text-ink-secondary mt-1 max-w-md mx-auto">
+                    Add API, Packaging, Excipients, or Consumables one-by-one, or download the Excel template and bulk upload all items at once.
+                  </p>
+                </div>
+                {!isArchived && (
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => setShowAddMaterialModal(true)}
+                      className="text-xs bg-forest hover:bg-forest-deep text-white"
+                    >
+                      <Plus className="h-3.5 w-3.5 mr-1" />
+                      Add First Product
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => downloadProjectMaterialsExcelTemplate(project.project_code)}
+                      className="text-xs border-forest/30 text-forest"
+                    >
+                      <Download className="h-3.5 w-3.5 mr-1" />
+                      Download Excel Template (.xlsx)
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowBulkUploadModal(true)}
+                      className="text-xs border-forest/30 text-forest"
+                    >
+                      <Upload className="h-3.5 w-3.5 mr-1" />
+                      Upload Excel / CSV
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Filter Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-ivory/50 p-3 rounded-lg border border-divider">
             <div className="flex items-center space-x-1.5">
@@ -1201,26 +1373,38 @@ export function ProjectDetailPage() {
 
                                 {/* Quick Action */}
                                 <TableCell className="text-right">
-                                  {mat.delivery_status === 'DELAYED' ? (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => navigate('/app/deliveries/issues')}
-                                      className="text-[10px] h-6 px-2 border-rose-300 text-rose-700 hover:bg-rose-50"
-                                    >
-                                      View Issue
-                                    </Button>
-                                  ) : (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => navigate('/app/deliveries')}
-                                      className="text-[10px] h-6 px-2 border-forest/30 text-forest hover:bg-forest/5"
-                                    >
-                                      <Truck className="h-2.5 w-2.5 mr-1" />
-                                      Track
-                                    </Button>
-                                  )}
+                                  <div className="flex items-center justify-end space-x-1">
+                                    {mat.delivery_status === 'DELAYED' ? (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => navigate('/app/deliveries/issues')}
+                                        className="text-[10px] h-6 px-2 border-rose-300 text-rose-700 hover:bg-rose-50"
+                                      >
+                                        View Issue
+                                      </Button>
+                                    ) : (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => navigate('/app/deliveries')}
+                                        className="text-[10px] h-6 px-2 border-forest/30 text-forest hover:bg-forest/5"
+                                      >
+                                        <Truck className="h-2.5 w-2.5 mr-1" />
+                                        Track
+                                      </Button>
+                                    )}
+                                    {!isArchived && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRemoveMaterial(mat.id, mat.material_code)}
+                                        className="p-1 rounded text-ink-muted hover:text-status-danger hover:bg-rose-50 transition-colors"
+                                        title={`Remove ${mat.material_code}`}
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </button>
+                                    )}
+                                  </div>
                                 </TableCell>
                               </TableRow>
                             );
@@ -1586,6 +1770,22 @@ export function ProjectDetailPage() {
           )}
         </div>
       )}
+      {/* Add Product One-by-One Modal */}
+      <AddProjectMaterialModal
+        open={showAddMaterialModal}
+        onOpenChange={setShowAddMaterialModal}
+        milestones={milestones.map((m) => ({ id: m.id, title: m.title }))}
+        onAddMaterial={handleAddSingleMaterial}
+      />
+
+      {/* Bulk Upload Excel / CSV Template Modal */}
+      <BulkUploadProjectMaterialsModal
+        open={showBulkUploadModal}
+        onOpenChange={setShowBulkUploadModal}
+        projectCode={project.project_code}
+        existingCount={projectMaterials.length}
+        onImportMaterials={handleBulkImportMaterials}
+      />
     </div>
   );
 }
